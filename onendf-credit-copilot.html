@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>oneNDF · Credit-Readiness Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C1B16; --ink-soft:#2A3B34; --paper:#FAF6EE; --paper-2:#F2EBDC; --card:#FFFFFF; --line:#E4DBC9;
+  --emerald:#0E6E4E; --emerald-deep:#0A5239; --emerald-tint:#E7F1EB;
+  --amber:#D9921A; --amber-tint:#FBEFD6;
+  --red:#B23B2E; --red-tint:#F8E6E2;
+  --slate:#6A7771;
+  --header-bg:rgba(250,246,238,.82);
+  --dial-track:#EFE7D6;
+  --grain:.035;
+  --bg-glow-1:rgba(14,110,78,.10); --bg-glow-2:rgba(217,146,26,.10);
+  --shadow:0 1px 2px rgba(12,27,22,.04), 0 8px 28px rgba(12,27,22,.07);
+  --shadow-lg:0 18px 50px rgba(12,27,22,.14);
+}
+[data-theme="dark"]{
+  --ink:#E9F2EC; --ink-soft:#B4C5BC; --paper:#081210; --paper-2:#12231C; --card:#0F1F19; --line:#22382F;
+  --emerald:#27C08A; --emerald-deep:#63E2B0; --emerald-tint:rgba(39,192,138,.16);
+  --amber:#EAB44A; --amber-tint:rgba(234,180,74,.16);
+  --red:#E8705F; --red-tint:rgba(232,112,95,.16);
+  --slate:#8FA098;
+  --header-bg:rgba(8,18,15,.82);
+  --dial-track:#1E332A;
+  --grain:.05;
+  --bg-glow-1:rgba(39,192,138,.14); --bg-glow-2:rgba(234,180,74,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 34px rgba(0,0,0,.5);
+  --shadow-lg:0 22px 60px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Hanken Grotesk',system-ui,sans-serif;
+  background:var(--paper); color:var(--ink);
+  -webkit-font-smoothing:antialiased; line-height:1.5;
+  background-image:
+    radial-gradient(1200px 500px at 88% -8%, var(--bg-glow-1), transparent 60%),
+    radial-gradient(900px 480px at -6% 8%, var(--bg-glow-2), transparent 55%);
+  background-attachment:fixed;
+  transition:background-color .5s ease, color .4s ease;
+}
+html[lang="hi"] body, html[lang="hi"] .chip, html[lang="hi"] .btn, html[lang="hi"] .msg,
+html[lang="hi"] input, html[lang="hi"] .step p, html[lang="hi"] .hero p, html[lang="hi"] .ad,
+html[lang="hi"] .at, html[lang="hi"] .gate-sub, html[lang="hi"] .asst-msg{font-family:'Mukta','Hanken Grotesk',sans-serif}
+.serif{font-family:'Fraunces',Georgia,serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+.mono{font-variant-numeric:tabular-nums}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:var(--grain);z-index:9998;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ===== Header ===== */
+header{position:sticky;top:0;z-index:50;background:var(--header-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:background .5s ease,border-color .4s ease}
+.bar{display:flex;align-items:center;justify-content:space-between;height:64px;gap:14px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.02em;font-size:19px}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--emerald);display:grid;place-items:center;color:#fff;font-family:'Fraunces';font-weight:600;font-size:18px;box-shadow:0 6px 16px rgba(14,110,78,.35)}
+.brand small{display:block;font-weight:600;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--slate);margin-top:-2px}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.tag-pill{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--emerald-deep);background:var(--emerald-tint);padding:6px 11px;border-radius:100px;border:1px solid transparent}
+.seg{display:inline-flex;background:var(--paper-2);border:1px solid var(--line);border-radius:100px;padding:3px;gap:2px}
+.seg button{font-family:inherit;font-weight:700;font-size:12.5px;border:none;background:none;color:var(--slate);padding:6px 12px;border-radius:100px;cursor:pointer;transition:all .2s ease;line-height:1}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--paper-2);cursor:pointer;display:grid;place-items:center;font-size:16px;transition:all .2s ease;color:var(--ink)}
+.icon-btn:hover{transform:translateY(-1px);border-color:var(--emerald)}
+@media(max-width:760px){.tag-pill{display:none}.brand small{display:none}}
+
+/* ===== Hero ===== */
+.hero{padding:64px 0 34px;position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--emerald-deep);margin-bottom:20px}
+.eyebrow::before{content:"";width:26px;height:2px;background:var(--amber)}
+.hero h1{font-family:'Fraunces';font-weight:600;font-size:clamp(38px,6vw,68px);line-height:1.02;letter-spacing:-.02em;max-width:16ch}
+.hero h1 em{font-style:italic;color:var(--emerald)}
+.hero p.lede{font-size:clamp(17px,2vw,20px);color:var(--ink-soft);max-width:54ch;margin-top:22px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px;align-items:center}
+.btn{font-family:'Hanken Grotesk';font-weight:700;font-size:16px;border:none;cursor:pointer;border-radius:13px;padding:15px 26px;transition:transform .15s ease, box-shadow .2s ease;display:inline-flex;align-items:center;gap:10px}
+.btn-primary{background:var(--emerald);color:#fff;box-shadow:0 10px 24px rgba(14,110,78,.32)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(14,110,78,.4)}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--ink)}
+.hero-meta{display:flex;gap:30px;margin-top:46px;flex-wrap:wrap}
+.hero-meta div b{font-family:'Fraunces';font-weight:600;font-size:30px;display:block;letter-spacing:-.02em}
+.hero-meta div span{font-size:12.5px;color:var(--slate);font-weight:600;letter-spacing:.02em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:54px 0 10px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.step .k{font-family:'Fraunces';font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--amber);text-transform:uppercase}
+.step h3{font-size:18px;margin:9px 0 6px;letter-spacing:-.01em}
+.step p{font-size:14px;color:var(--slate)}
+.step::after{content:"";position:absolute;right:-26px;top:-26px;width:80px;height:80px;border-radius:50%;background:var(--emerald-tint)}
+
+/* ===== Chat ===== */
+.screen{display:none}
+.screen.active{display:block;animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.chatwrap{max-width:680px;margin:30px auto;padding:0 18px}
+.progress{height:6px;background:var(--line);border-radius:100px;overflow:hidden;margin-bottom:8px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--emerald),var(--amber));border-radius:100px;width:0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.progress-label{font-size:12px;color:var(--slate);font-weight:600;letter-spacing:.04em;margin-bottom:18px;display:flex;justify-content:space-between}
+.thread{display:flex;flex-direction:column;gap:14px;min-height:340px;padding:6px 2px 14px}
+.msg{max-width:84%;padding:13px 17px;border-radius:18px;font-size:15.5px;animation:pop .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.msg.bot{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:6px;box-shadow:var(--shadow)}
+.msg.bot .who{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--emerald);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.msg.bot .who .dot{width:7px;height:7px;border-radius:50%;background:var(--emerald)}
+.msg.user{align-self:flex-end;background:var(--emerald);color:#fff;border-bottom-right-radius:6px}
+.typing{display:flex;gap:5px;padding:6px 2px}
+.typing span{width:8px;height:8px;border-radius:50%;background:var(--slate);opacity:.5;animation:bob 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bob{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.inputzone{margin-top:6px;padding:16px 2px 30px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{font-family:'Hanken Grotesk';font-weight:600;font-size:15px;padding:12px 18px;border-radius:13px;background:var(--card);border:1.5px solid var(--line);cursor:pointer;transition:all .15s ease;color:var(--ink)}
+.chip:hover{border-color:var(--emerald);background:var(--emerald-tint);transform:translateY(-2px)}
+.numrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.numinput{flex:1;min-width:180px;display:flex;align-items:center;border:1.5px solid var(--line);border-radius:13px;background:var(--card);padding:0 14px;font-size:18px;font-weight:700}
+.numinput span{color:var(--slate);font-weight:700}
+.numinput input{border:none;outline:none;font-family:'Hanken Grotesk';font-size:18px;font-weight:700;padding:13px 8px;width:100%;background:transparent;color:var(--ink)}
+.numhint{font-size:12.5px;color:var(--slate);margin-top:8px;font-weight:600}
+
+/* ===== Results ===== */
+.results{padding:30px 0 80px}
+.rhead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.rhead h2{font-family:'Fraunces';font-weight:600;font-size:clamp(26px,4vw,38px);letter-spacing:-.02em}
+.rhead p{color:var(--slate);font-size:14.5px;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:880px){.grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.hero{padding-top:40px}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+.panel.full{grid-column:1/-1}
+.panel-h{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.panel-h .ic{width:30px;height:30px;border-radius:9px;background:var(--emerald-tint);display:grid;place-items:center;color:var(--emerald-deep);font-size:15px}
+.panel-h h3{font-size:17px;letter-spacing:-.01em}
+.panel-h small{display:block;color:var(--slate);font-size:12px;font-weight:600}
+.scorebox{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.dial{position:relative;width:152px;height:152px;flex-shrink:0}
+.dial svg{transform:rotate(-90deg)}
+.dial .num{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.dial .num b{font-family:'Fraunces';font-weight:600;font-size:46px;letter-spacing:-.02em;line-height:1}
+.dial .num small{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--slate);text-transform:uppercase}
+.gradechip{display:inline-block;padding:5px 12px;border-radius:9px;font-weight:800;font-size:13px;letter-spacing:.03em}
+.scoremeta h4{font-family:'Fraunces';font-weight:600;font-size:22px;letter-spacing:-.01em;margin:10px 0 4px}
+.scoremeta p{font-size:14px;color:var(--ink-soft);max-width:34ch}
+.dims{margin-top:6px;display:flex;flex-direction:column;gap:13px}
+.dim .dl{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;margin-bottom:5px}
+.dim .dl span:last-child{color:var(--slate);font-weight:700}
+.track{height:8px;background:var(--paper-2);border-radius:100px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:100px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.lender{display:flex;align-items:center;gap:14px;padding:14px 6px;border-bottom:1px solid var(--line)}
+.lender:last-child{border-bottom:none}
+.lavatar{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-family:'Fraunces';font-weight:600;font-size:17px;color:#fff;flex-shrink:0}
+.linfo{flex:1;min-width:0}
+.linfo .ln{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.ltype{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);background:var(--paper-2);padding:2px 7px;border-radius:5px}
+.linfo .lr{font-size:12.5px;color:var(--slate);font-weight:600;margin-top:2px}
+.lright{text-align:right;flex-shrink:0}
+.status{font-size:12px;font-weight:800;padding:5px 11px;border-radius:8px;letter-spacing:.02em;white-space:nowrap}
+.s-likely{background:var(--emerald-tint);color:var(--emerald-deep)}
+.s-border{background:var(--amber-tint);color:var(--amber)}
+.s-unlikely{background:var(--red-tint);color:var(--red)}
+.matchpct{font-size:12px;color:var(--slate);font-weight:700;margin-top:5px}
+.filterbar{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.fbtn{font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:9px;border:1.5px solid var(--line);background:transparent;cursor:pointer;color:var(--ink-soft);font-family:inherit}
+.fbtn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.action{display:flex;gap:14px;padding:16px 0;border-bottom:1px dashed var(--line)}
+.action:last-child{border-bottom:none}
+.anum{width:30px;height:30px;border-radius:9px;background:var(--amber);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;flex-shrink:0}
+.action .at{font-weight:700;font-size:15px}
+.action .ad{font-size:13.5px;color:var(--ink-soft);margin-top:3px}
+.gain{display:inline-flex;gap:7px;margin-top:8px;flex-wrap:wrap}
+.gain b{font-size:11.5px;font-weight:800;letter-spacing:.02em;padding:4px 9px;border-radius:7px;background:var(--emerald-tint);color:var(--emerald-deep)}
+.gain b.amber{background:var(--amber-tint);color:var(--amber)}
+.leadtop{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.prio{font-family:'Fraunces';font-weight:600;font-size:30px;letter-spacing:-.02em}
+.disp{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:7px 13px;border-radius:9px}
+.leadgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 26px}
+.lg .k{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9DB5AC}
+.lg .v{font-size:15px;font-weight:700;margin-top:1px;color:#fff}
+.nextact{margin-top:18px;padding:14px 16px;border-radius:12px}
+.nextact .k{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.nextact .v{font-size:14.5px;font-weight:600;margin-top:3px}
+.copybtn{margin-top:16px}
+.copybtn .btn{font-size:14px;padding:11px 18px}
+.disclaimer{font-size:12px;color:var(--slate);text-align:center;margin-top:34px;max-width:70ch;margin-left:auto;margin-right:auto;line-height:1.6}
+footer{border-top:1px solid var(--line);padding:26px 0;margin-top:30px}
+.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--slate)}
+.restart{background:none;border:none;color:var(--emerald);font-weight:700;cursor:pointer;font-size:14px;font-family:inherit}
+
+/* ===== Watermark ===== */
+.watermark{position:fixed;right:16px;bottom:16px;z-index:60;display:inline-flex;align-items:center;gap:7px;
+  padding:7px 13px;border-radius:999px;background:rgba(12,27,22,.82);backdrop-filter:blur(8px);
+  color:#FAF6EE;font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:.01em;
+  box-shadow:0 6px 20px rgba(12,27,22,.22);border:1px solid rgba(255,255,255,.10);
+  text-decoration:none;transition:transform .15s ease, opacity .15s ease;opacity:.92}
+.watermark:hover{transform:translateY(-2px);opacity:1}
+.watermark .wm-heart{color:#FF6B5E;font-size:13px;line-height:1}
+.watermark .wm-flag{font-size:13px;line-height:1}
+@media(max-width:640px){.watermark{font-size:11px;padding:6px 11px;right:10px;bottom:64px}}
+
+/* ===== Name Gate + Celebration ===== */
+.gate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;
+  background:
+    radial-gradient(900px 520px at 80% -10%, var(--emerald-tint), transparent 60%),
+    radial-gradient(800px 460px at -5% 110%, var(--amber-tint), transparent 60%),
+    var(--paper);
+  transition:opacity .7s ease;overflow:hidden}
+.gate.gone{opacity:0;pointer-events:none}
+.gate-card{position:relative;z-index:3;width:100%;max-width:480px;background:var(--card);border:1px solid var(--line);
+  border-radius:26px;padding:40px 38px;box-shadow:var(--shadow-lg);text-align:center;animation:gateIn .6s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes gateIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:none}}
+.gate-logo{width:54px;height:54px;border-radius:15px;background:var(--emerald);display:grid;place-items:center;color:#fff;font-family:'Fraunces';font-weight:600;font-size:28px;margin:0 auto 18px;box-shadow:0 12px 30px rgba(14,110,78,.4)}
+.gate-eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:12px}
+.gate-card h2{font-family:'Fraunces';font-weight:600;font-size:clamp(26px,4.5vw,34px);letter-spacing:-.02em;line-height:1.08}
+.gate-sub{color:var(--slate);font-size:15px;margin-top:12px;max-width:34ch;margin-left:auto;margin-right:auto}
+.gate-input{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+.gate-input input{font-family:inherit;font-size:18px;font-weight:600;text-align:center;padding:16px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);outline:none;transition:border-color .2s}
+.gate-input input:focus{border-color:var(--emerald)}
+.gate-input .btn{justify-content:center}
+.gate-skip{margin-top:14px;background:none;border:none;color:var(--slate);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline}
+.gate-toggles{position:absolute;top:20px;right:22px;z-index:4;display:flex;gap:8px}
+/* celebration */
+.celebrate{display:none;position:relative;z-index:3;text-align:center;animation:gateIn .5s ease}
+.celebrate.show{display:block}
+.celebrate .pop{font-size:54px;animation:popper .8s ease both}
+@keyframes popper{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.celebrate h2{font-family:'Fraunces';font-weight:600;font-size:clamp(30px,6vw,52px);letter-spacing:-.02em;line-height:1.05;margin-top:8px}
+.celebrate h2 em{font-style:italic;color:var(--emerald)}
+.celebrate p{color:var(--ink-soft);font-size:16px;margin-top:14px}
+#confetti{position:fixed;inset:0;z-index:2;pointer-events:none}
+.balloon{position:fixed;bottom:-140px;width:46px;height:58px;border-radius:50% 50% 48% 48%;z-index:1;pointer-events:none;opacity:.92;animation:floatUp linear forwards}
+.balloon::after{content:"";position:absolute;bottom:-30px;left:50%;width:1px;height:30px;background:rgba(0,0,0,.25)}
+@keyframes floatUp{from{transform:translateY(0) rotate(0)}to{transform:translateY(-118vh) rotate(18deg);opacity:0}}
+
+/* ===== Live Assistant ===== */
+.asst-fab{position:fixed;left:18px;bottom:18px;z-index:70;display:inline-flex;align-items:center;gap:10px;
+  padding:12px 18px 12px 14px;border-radius:100px;border:none;cursor:pointer;background:var(--emerald);color:#fff;
+  font-family:inherit;font-weight:700;font-size:14.5px;box-shadow:0 12px 30px rgba(14,110,78,.4);transition:transform .18s ease}
+.asst-fab:hover{transform:translateY(-2px) scale(1.02)}
+.asst-fab .av{width:30px;height:30px;border-radius:50%;background:#fff;color:var(--emerald);display:grid;place-items:center;font-family:'Fraunces';font-weight:600;font-size:17px}
+.asst-fab .liveping{width:8px;height:8px;border-radius:50%;background:#7CFFCB;box-shadow:0 0 0 0 rgba(124,255,203,.7);animation:ping 1.6s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(124,255,203,.6)}70%{box-shadow:0 0 0 9px rgba(124,255,203,0)}100%{box-shadow:0 0 0 0 rgba(124,255,203,0)}}
+.asst-panel{position:fixed;left:18px;bottom:18px;z-index:71;width:min(380px,calc(100vw - 36px));height:min(560px,calc(100vh - 100px));
+  background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:gateIn .35s ease}
+.asst-panel.open{display:flex}
+.asst-head{padding:16px 18px;background:linear-gradient(135deg,var(--emerald),var(--emerald-deep));color:#fff;display:flex;align-items:center;gap:12px}
+.asst-head .av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-family:'Fraunces';font-weight:600;font-size:19px}
+.asst-head h4{font-size:16px;letter-spacing:-.01em}
+.asst-head .st{font-size:11.5px;opacity:.85;font-weight:600;display:flex;align-items:center;gap:6px;margin-top:1px}
+.asst-head .st .d{width:7px;height:7px;border-radius:50%;background:#7CFFCB}
+.asst-head .x{margin-left:auto;background:rgba(255,255,255,.16);border:none;color:#fff;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:16px}
+.asst-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--paper)}
+.asst-msg{max-width:86%;padding:11px 14px;border-radius:15px;font-size:14.5px;line-height:1.5}
+.asst-msg.bot{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:5px}
+.asst-msg.user{align-self:flex-end;background:var(--emerald);color:#fff;border-bottom-right-radius:5px}
+.asst-sugg{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 12px;background:var(--paper)}
+.asst-sugg button{font-family:inherit;font-size:12px;font-weight:600;padding:7px 11px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;transition:all .15s}
+.asst-sugg button:hover{border-color:var(--emerald);color:var(--emerald)}
+.asst-foot{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:var(--card)}
+.asst-foot input{flex:1;font-family:inherit;font-size:14.5px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);outline:none}
+.asst-foot input:focus{border-color:var(--emerald)}
+.asst-foot button{border:none;background:var(--emerald);color:#fff;width:46px;border-radius:12px;cursor:pointer;font-size:18px;flex-shrink:0}
+.asst-typing{display:flex;gap:4px;padding:4px}
+.asst-typing span{width:7px;height:7px;border-radius:50%;background:var(--slate);opacity:.5;animation:bob 1s infinite}
+.asst-typing span:nth-child(2){animation-delay:.15s}.asst-typing span:nth-child(3){animation-delay:.3s}
+@media(max-width:640px){.asst-panel{left:10px;bottom:10px;height:calc(100vh - 84px)}.asst-fab{left:10px;bottom:10px}}
+</style>
+</head>
+<body>
+
+<!-- ============ NAME GATE + CELEBRATION ============ -->
+<div class="gate" id="gate">
+  <div class="gate-toggles">
+    <div class="seg" id="gateLangSeg">
+      <button data-lang="en" class="on">EN</button>
+      <button data-lang="hi">हिं</button>
+    </div>
+    <button class="icon-btn" id="gateTheme" title="Theme">🌙</button>
+  </div>
+
+  <div class="gate-card" id="gateForm">
+    <div class="gate-logo">N</div>
+    <div class="gate-eyebrow" data-i18n="gate_eyebrow">Welcome aboard</div>
+    <h2 class="serif" data-i18n="gate_title">What should we call you?</h2>
+    <p class="gate-sub" data-i18n="gate_sub">Let's personalise your credit-readiness journey. Pop in your name to begin.</p>
+    <div class="gate-input">
+      <input id="nameInput" type="text" maxlength="40" autocomplete="off" data-i18n-ph="gate_ph" placeholder="Your name…">
+      <button class="btn btn-primary" id="gateEnter" data-i18n="gate_btn">Enter oneNDF →</button>
+    </div>
+    <button class="gate-skip" id="gateSkip" data-i18n="gate_skip">Skip for now</button>
+  </div>
+
+  <div class="celebrate" id="celebrate">
+    <div class="pop">🎉</div>
+    <h2 class="serif" id="welcomeLine"></h2>
+    <p data-i18n="gate_welcome_sub">Your AI credit advisor is getting things ready…</p>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
+
+<header>
+  <div class="wrap bar">
+    <div class="brand">
+      <div class="logo">N</div>
+      <div>oneNDF<small data-i18n="brand_sub">Credit-Readiness Copilot</small></div>
+    </div>
+    <div class="hdr-right">
+      <div class="seg" id="langSeg">
+        <button data-lang="en" class="on">EN</button>
+        <button data-lang="hi">हिं</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme">🌙</button>
+      <div class="tag-pill" id="headerPill" data-i18n="pill_know">Know · Plan · Execute</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="screen active" id="screen-hero">
+  <div class="wrap hero">
+    <div class="eyebrow" data-i18n="hero_eyebrow">For 63M Indian MSMEs</div>
+    <h1 class="serif" data-i18n-html="hero_h1">Know which lender says <em>yes</em> — before you ever apply.</h1>
+    <p class="lede" data-i18n-html="hero_lede">Meet <b>Disha</b>, your AI credit advisor. Answer a few questions in 90 seconds and get a live Financial Health Card, a real-time match across our lender panel, and an exact plan to unlock more approvals — no rejections, no guesswork.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="startChat()" data-i18n="cta_check">Check my readiness — free →</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})" data-i18n="cta_how">How it works</button>
+    </div>
+    <div class="hero-meta">
+      <div><b>₹3,000 Cr+</b><span data-i18n="meta1">Disbursed to MSMEs</span></div>
+      <div><b>120+</b><span data-i18n="meta2">Banks &amp; NBFCs on panel</span></div>
+      <div><b>&lt; 90 sec</b><span data-i18n="meta3">To your Health Card</span></div>
+    </div>
+    <div class="steps" id="how">
+      <div class="step"><div class="k" data-i18n="step1k">01 · Know</div><h3 data-i18n="step1h">Talk to Disha</h3><p data-i18n="step1p">A natural conversation captures your profile — no 14-page form, no document upload to start.</p></div>
+      <div class="step"><div class="k" data-i18n="step2k">02 · Plan</div><h3 data-i18n="step2h">See your matches</h3><p data-i18n="step2p">A transparent Credit-Readiness Score and a lender-by-lender verdict: who approves, who doesn't, and why.</p></div>
+      <div class="step"><div class="k" data-i18n="step3k">03 · Execute</div><h3 data-i18n="step3h">Unlock more lenders</h3><p data-i18n="step3p">A prioritised Path-to-Approval shows the exact moves that turn a "no" into a "yes" — in days, not months.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAT ============ -->
+<section class="screen" id="screen-chat">
+  <div class="chatwrap">
+    <div class="progress"><i id="progBar"></i></div>
+    <div class="progress-label"><span id="progText"></span><span id="progPct">0%</span></div>
+    <div class="thread" id="thread"></div>
+    <div class="inputzone" id="inputzone"></div>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="screen" id="screen-results">
+  <div class="wrap results">
+    <div class="rhead">
+      <div>
+        <h2 class="serif" data-i18n="res_title">Your Financial Health Card</h2>
+        <p id="profileLine"></p>
+      </div>
+      <button class="restart" onclick="restart()" data-i18n="restart">↻ Start over</button>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-h"><div class="ic">◎</div><div><h3 data-i18n="p_score_h">Credit-Readiness Score</h3><small data-i18n="p_score_s">Weighted across 6 lending dimensions</small></div></div>
+        <div class="scorebox">
+          <div class="dial">
+            <svg width="152" height="152" viewBox="0 0 152 152">
+              <circle id="dialTrack" cx="76" cy="76" r="64" fill="none" stroke="#EFE7D6" stroke-width="16"/>
+              <circle id="dialArc" cx="76" cy="76" r="64" fill="none" stroke="#0E6E4E" stroke-width="16" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"/>
+            </svg>
+            <div class="num"><b id="scoreNum" class="mono">0</b><small>/ 100</small></div>
+          </div>
+          <div class="scoremeta">
+            <span class="gradechip" id="gradeChip"></span>
+            <h4 id="gradeTitle"></h4>
+            <p id="gradeDesc"></p>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><div class="ic">▤</div><div><h3 data-i18n="p_dims_h">What's driving your score</h3><small data-i18n="p_dims_s">Strengths and gaps, lender-grade</small></div></div>
+        <div class="dims" id="dims"></div>
+      </div>
+      <div class="panel full">
+        <div class="panel-h"><div class="ic">⊞</div><div><h3 data-i18n="p_lenders_h">Lender Match Board</h3><small id="lenderSub"></small></div></div>
+        <div class="filterbar" id="filterbar"></div>
+        <div id="lenderList"></div>
+      </div>
+      <div class="panel full">
+        <div class="panel-h"><div class="ic">➚</div><div><h3 data-i18n="p_path_h">Your Path to Approval</h3><small data-i18n="p_path_s">Prioritised by lenders unlocked — the oneNDF difference</small></div></div>
+        <div id="pathList"></div>
+      </div>
+      <div class="panel full" style="background:linear-gradient(180deg,#0C1B16,#102a20);color:#EAF3EE;border:none">
+        <div class="panel-h"><div class="ic" style="background:rgba(255,255,255,.1);color:#fff">⎙</div><div><h3 style="color:#fff" data-i18n="p_lead_h">Qualified-Lead Handoff</h3><small style="color:#9DB5AC" data-i18n="p_lead_s">Auto-generated for the oneNDF Relationship Manager</small></div></div>
+        <div class="leadtop">
+          <div class="prio serif" id="leadPrio" style="color:#fff"></div>
+          <div class="disp" id="leadDisp"></div>
+        </div>
+        <div class="leadgrid" id="leadGrid"></div>
+        <div class="nextact" style="background:rgba(217,146,26,.16);border:1px solid rgba(217,146,26,.4)">
+          <div class="k" style="color:#F0C56B" data-i18n="lead_next_k">Recommended next action</div>
+          <div class="v" id="leadNext" style="color:#fff"></div>
+        </div>
+        <div class="copybtn"><button class="btn btn-primary" onclick="copyLead()" id="copyBtn" style="background:var(--amber);box-shadow:none" data-i18n="copy_btn">⧉ Copy lead summary to CRM</button></div>
+      </div>
+    </div>
+    <p class="disclaimer" data-i18n-html="disclaimer">Demo build. Lender names and eligibility thresholds shown here are <b>illustrative</b> for product demonstration and do not represent live underwriting policy. Scores are computed by a transparent, rules-based engine — in production this is enriched with bureau (Experian), GST, and bank-statement APIs, and validated against live lender criteria.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span data-i18n="foot_left">oneNDF · Credit-Readiness Copilot — concept prototype</span>
+    <span>Built by Abhishek S · with ❤ in India</span>
+  </div>
+</footer>
+
+<!-- ============ LIVE ASSISTANT ============ -->
+<button class="asst-fab" id="asstFab">
+  <span class="av">D</span>
+  <span data-i18n="asst_fab">Ask Disha</span>
+  <span class="liveping"></span>
+</button>
+<div class="asst-panel" id="asstPanel">
+  <div class="asst-head">
+    <div class="av">D</div>
+    <div>
+      <h4>Disha</h4>
+      <div class="st"><span class="d"></span><span id="asstStatus" data-i18n="asst_mode_demo">Demo mode</span></div>
+    </div>
+    <button class="x" id="asstClose">✕</button>
+  </div>
+  <div class="asst-body" id="asstBody"></div>
+  <div class="asst-sugg" id="asstSugg"></div>
+  <div class="asst-foot">
+    <input id="asstInput" type="text" data-i18n-ph="asst_ph" placeholder="Type your question…">
+    <button id="asstSend">➤</button>
+  </div>
+</div>
+
+<div class="watermark" title="Built by Abhishek S with love in India">
+  Built by Abhishek S <span class="wm-heart">❤</span> <span class="wm-flag">🇮🇳</span>
+</div>
+
+<script>
+/* =================================================================
+   oneNDF Credit-Readiness Copilot — engine + controller
+   Pure, client-side scoring engine (unchanged & smoke-tested).
+================================================================= */
+const LENDERS = [
+  {id:'hdfc', name:'HDFC Bank',          type:'Bank', color:'#0B4DA2', products:['lap','business'],        minCibil:730, maxFoir:0.55, maxLtv:0.65, minVintage:3, minTurnover:15000000, gst:true,  baseRate:9.5,  speed:10},
+  {id:'icici',name:'ICICI Bank',         type:'Bank', color:'#A33B2A', products:['lap','business','wc'],   minCibil:720, maxFoir:0.58, maxLtv:0.70, minVintage:3, minTurnover:10000000, gst:true,  baseRate:9.75, speed:9},
+  {id:'axis', name:'Axis Bank',          type:'Bank', color:'#8A1538', products:['lap','business'],        minCibil:710, maxFoir:0.60, maxLtv:0.70, minVintage:2, minTurnover:7500000,  gst:true,  baseRate:10.25,speed:9},
+  {id:'sc',   name:'Standard Chartered', type:'Bank', color:'#0473AA', products:['lap'],                   minCibil:740, maxFoir:0.55, maxLtv:0.60, minVintage:3, minTurnover:20000000, gst:true,  baseRate:9.25, speed:12},
+  {id:'db',   name:'Deutsche Bank',      type:'Bank', color:'#1F3A93', products:['lap'],                   minCibil:750, maxFoir:0.50, maxLtv:0.60, minVintage:5, minTurnover:30000000, gst:true,  baseRate:9.0,  speed:14},
+  {id:'tata', name:'Tata Capital',       type:'NBFC', color:'#486AAE', products:['lap','business','wc'],   minCibil:700, maxFoir:0.65, maxLtv:0.75, minVintage:2, minTurnover:5000000,  gst:false, baseRate:11.0, speed:6},
+  {id:'bajaj',name:'Bajaj Finserv',      type:'NBFC', color:'#0A2756', products:['business','wc','lap'],   minCibil:685, maxFoir:0.65, maxLtv:0.75, minVintage:2, minTurnover:4000000,  gst:false, baseRate:12.5, speed:4},
+  {id:'hero', name:'Hero FinCorp',       type:'NBFC', color:'#D2222D', products:['business','wc'],         minCibil:670, maxFoir:0.70, maxLtv:0.80, minVintage:1, minTurnover:2500000,  gst:false, baseRate:14.0, speed:4},
+  {id:'abfl', name:'Aditya Birla Fin.',  type:'NBFC', color:'#C8102E', products:['lap','business'],        minCibil:700, maxFoir:0.62, maxLtv:0.72, minVintage:2, minTurnover:6000000,  gst:false, baseRate:11.5, speed:6},
+  {id:'lnt',  name:'L&T Finance',        type:'NBFC', color:'#0072BC', products:['lap','wc'],              minCibil:690, maxFoir:0.65, maxLtv:0.75, minVintage:2, minTurnover:5000000,  gst:false, baseRate:11.75,speed:7}
+];
+const LOAN_CFG = {
+  lap:      {label:'Loan Against Property', rateP:10.5, tenureM:180},
+  business: {label:'Business Loan',         rateP:16.0, tenureM:48},
+  wc:       {label:'Working Capital',       rateP:14.0, tenureM:36}
+};
+const CIBIL_MID = {'750+':775,'700-750':725,'650-700':675,'<650':620,'unknown':710};
+
+function emi(P, annualRate, months){const r=annualRate/1200; if(r===0)return P/months; const f=Math.pow(1+r,months); return P*r*f/(f-1);}
+function fmtINR(n){
+  n=Math.max(0,Math.round(n));
+  if(n>=10000000){let v=n/10000000; return '₹'+(v%1?v.toFixed(2):v)+' Cr';}
+  if(n>=100000){let v=n/100000; return '₹'+(v%1?v.toFixed(1):v)+' L';}
+  return '₹'+n.toLocaleString('en-IN');
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+function analyze(p){
+  const cfg = LOAN_CFG[p.loanType];
+  const cibil = CIBIL_MID[p.cibilBand] || 710;
+  const assessedIncome = Math.max(p.annualTurnover*0.20/12, p.avgBalance*0.8, 1);
+  const proposedEmi = emi(p.amount, cfg.rateP, cfg.tenureM);
+  const foir = (p.existingEmi + proposedEmi) / assessedIncome;
+  const ltv = (p.loanType==='lap' && p.propertyValue>0) ? p.amount/p.propertyValue : null;
+
+  const dRepay = foir<=0.40?100: foir<=0.50?85: foir<=0.55?70: foir<=0.65?45:20;
+  const dBureau= cibil>=750?100: cibil>=700?80: cibil>=650?55:25;
+  let dColl, collKind;
+  if(p.loanType==='lap'){
+    collKind='lap';
+    dColl = ltv==null?50: ltv<=0.50?100: ltv<=0.60?90: ltv<=0.70?75: ltv<=0.75?55:30;
+  } else {
+    collKind='cf';
+    const cov = p.annualTurnover/Math.max(p.amount,1);
+    dColl = cov>=4?100: cov>=2?85: cov>=1?65: cov>=0.5?45:25;
+  }
+  const dVint  = p.vintageYears>=5?100: p.vintageYears>=3?80: p.vintageYears>=2?60: p.vintageYears>=1?40:20;
+  const balRatio = p.avgBalance/Math.max(proposedEmi,1);
+  const dBank  = balRatio>=3?100: balRatio>=2?80: balRatio>=1?60: balRatio>=0.5?40:20;
+  let docPts=0,docTot=p.loanType==='lap'?3:2;
+  if(p.gst)docPts++; if(p.annualTurnover>0)docPts++; if(p.loanType==='lap'&&p.propertyValue>0)docPts++;
+  const dDoc = Math.round(docPts/docTot*100);
+
+  const W = {repay:0.28,bureau:0.24,coll:0.18,vint:0.14,bank:0.10,doc:0.06};
+  const score = Math.round(dRepay*W.repay + dBureau*W.bureau + dColl*W.coll + dVint*W.vint + dBank*W.bank + dDoc*W.doc);
+
+  const dims = [
+    {key:'repay', meta:'FOIR '+(foir*100).toFixed(0)+'%', val:dRepay},
+    {key:'bureau',meta:'CIBIL ~'+cibil, val:dBureau},
+    {key:'coll',  collKind:collKind, meta:(ltv!=null?(ltv*100).toFixed(0)+'%':''), val:dColl},
+    {key:'vint',  meta:p.vintageYears+(currentLang==='hi'?' साल':' yr'), val:dVint},
+    {key:'bank',  meta:'', val:dBank},
+    {key:'doc',   meta:'', val:dDoc}
+  ];
+
+  const lenders = LENDERS.map(L=>{
+    const offers = L.products.includes(p.loanType);
+    const checks = [];
+    const add=(name,pass,weight,fixable)=>checks.push({name,pass,weight,fixable});
+    add('CIBIL ≥ '+L.minCibil, cibil>=L.minCibil, 0.26, true);
+    add('FOIR ≤ '+(L.maxFoir*100)+'%', foir<=L.maxFoir, 0.24, true);
+    if(p.loanType==='lap') add('LTV ≤ '+(L.maxLtv*100)+'%', ltv==null||ltv<=L.maxLtv, 0.20, true);
+    add('Vintage ≥ '+L.minVintage+'y', p.vintageYears>=L.minVintage, 0.12, false);
+    add('Turnover ≥ '+fmtINR(L.minTurnover), p.annualTurnover>=L.minTurnover, 0.10, false);
+    add('GST', !L.gst || p.gst, 0.08, true);
+
+    const totW = checks.reduce((s,c)=>s+c.weight,0);
+    const passW= checks.reduce((s,c)=>s+(c.pass?c.weight:0),0);
+    const matchPct = offers? Math.round(passW/totW*100) : 0;
+    const failed = checks.filter(c=>!c.pass);
+
+    let status, reasonKey, reasonArg='';
+    if(!offers){status='unlikely'; reasonKey='nooffer'; reasonArg=cfg.label;}
+    else if(failed.length===0){status='likely'; reasonKey='all';}
+    else if(failed.length===1 && matchPct>=82){status='border'; reasonKey='close'; reasonArg=failed[0].name;}
+    else if(matchPct>=72){status='border'; reasonKey='gaps'; reasonArg=failed.slice(0,2).map(f=>f.name).join(', ');}
+    else {status='unlikely'; reasonKey='below'; reasonArg=failed.slice(0,2).map(f=>f.name).join(', ');}
+
+    const bump = cibil>=750?0: cibil>=700?0.25: cibil>=650?0.9:1.75;
+    const lo=(L.baseRate+bump), hi=lo+0.85;
+    const maxEmiCap = assessedIncome*L.maxFoir - p.existingEmi;
+    const r=cfg.rateP/1200, f=Math.pow(1+r,cfg.tenureM);
+    const foirAmt = maxEmiCap>0 ? maxEmiCap*(f-1)/(r*f) : 0;
+    const ltvAmt = (p.loanType==='lap'&&p.propertyValue>0)? L.maxLtv*p.propertyValue : Infinity;
+    const eligible = Math.max(0, Math.min(foirAmt, ltvAmt));
+
+    return {...L, offers, status, reasonKey, reasonArg, matchPct, failed, rateLo:lo, rateHi:hi, eligible};
+  }).sort((a,b)=> (b.offers-a.offers) || (b.matchPct-a.matchPct));
+
+  const likely = lenders.filter(l=>l.status==='likely').length;
+  const border = lenders.filter(l=>l.status==='border').length;
+  return {score, foir, ltv, cibil, proposedEmi, assessedIncome, dims, lenders, likely, border, cfg};
+}
+
+function candidateFixes(cur){
+  const a = analyze(cur);
+  const list = [];
+  if(cur.existingEmi>0 && a.foir>0.50){
+    const targetTotalEmi = a.assessedIncome*0.45;
+    const newExisting = clamp(targetTotalEmi - a.proposedEmi, 0, cur.existingEmi);
+    const cut = cur.existingEmi - newExisting;
+    if(cut>2000) list.push({id:'emi', tkey:'fix_emi_t',
+      desc:tfix('fix_emi_d',{cut:fmtINR(cut),foir:(a.foir*100).toFixed(0)}),
+      next:{...cur, existingEmi:newExisting}});
+  }
+  if(cur.loanType==='lap' && a.ltv!=null && a.ltv>0.62){
+    const newAmt = Math.round(0.60*cur.propertyValue);
+    if(newAmt>0 && newAmt<cur.amount) list.push({id:'ltv', tkey:'fix_ltv_t',
+      desc:tfix('fix_ltv_d',{amt:fmtINR(newAmt)}), next:{...cur, amount:newAmt}});
+  } else if(cur.loanType!=='lap' && a.foir>0.55){
+    const maxEmi = a.assessedIncome*0.50 - cur.existingEmi;
+    if(maxEmi>3000){
+      const cfg=LOAN_CFG[cur.loanType], r=cfg.rateP/1200, f=Math.pow(1+r,cfg.tenureM);
+      let serviceable = Math.round(maxEmi*(f-1)/(r*f)/100000)*100000;
+      if(serviceable>0 && serviceable<cur.amount) list.push({id:'size', tkey:'fix_size_t',
+        desc:tfix('fix_size_d',{amt:fmtINR(serviceable)}), next:{...cur, amount:serviceable}});
+    }
+  }
+  if(cur.cibilBand && cur.cibilBand!=='750+'){
+    const nextBand = cur.cibilBand==='<650'?'650-700': cur.cibilBand==='650-700'?'700-750': '750+';
+    list.push({id:'cibil', tkey:'fix_cibil_t', tkeyArg:{band:nextBand},
+      desc:tfix('fix_cibil_d',{band:nextBand}), next:{...cur, cibilBand:nextBand}});
+  }
+  if(!cur.gst) list.push({id:'gst', tkey:'fix_gst_t', desc:tfix('fix_gst_d',{}), next:{...cur, gst:true}});
+  return list;
+}
+
+function buildPath(p, base){
+  let cur = {...p};
+  const chosen = [];
+  const usedIds = new Set();
+  for(let iter=0; iter<4; iter++){
+    const ca = analyze(cur); const cl = ca.likely, cs = ca.score;
+    const cands = candidateFixes(cur).filter(c=>!usedIds.has(c.id));
+    if(cands.length===0) break;
+    let best=null;
+    for(const c of cands){
+      const na = analyze(c.next);
+      const cand = {...c, unlocked: na.likely-cl, scoreGain: na.score-cs};
+      if(!best || cand.unlocked>best.unlocked || (cand.unlocked===best.unlocked && cand.scoreGain>best.scoreGain)) best=cand;
+    }
+    if(best.unlocked<=0 && best.scoreGain<=0 && chosen.length>=2) break;
+    chosen.push(best); usedIds.add(best.id); cur = best.next;
+  }
+  if(chosen.length===0){
+    const balRatio = p.avgBalance/Math.max(base.proposedEmi,1);
+    if(balRatio<2) chosen.push({tkey:'fix_bank_t', desc:tfix('fix_bank_d',{amt:fmtINR(Math.round(base.proposedEmi*2))}), unlocked:0, scoreGain:0});
+  }
+  return chosen;
+}
+
+function buildLead(p, base){
+  let prio, dispKey, dispColor, nextKey;
+  if(base.score>=78 && base.likely>=2){ prio='P0'; dispKey='disp_hot'; dispColor='#1FB373'; nextKey='lead_next_p0'; }
+  else if(base.score>=64 && (base.likely+base.border)>=2){ prio='P1'; dispKey='disp_warm_ready'; dispColor='#E0A526'; nextKey='lead_next_p1'; }
+  else if(base.score>=50){ prio='P2'; dispKey='disp_warm_cond'; dispColor='#E0A526'; nextKey='lead_next_p2'; }
+  else { prio='P3'; dispKey='disp_nurture'; dispColor='#B86B5A'; nextKey='lead_next_p3'; }
+  const topLenders = base.lenders.filter(l=>l.status!=='unlikely').slice(0,3).map(l=>l.name).join(', ') || '—';
+  return {prio, dispKey, dispColor, nextKey, topLenders};
+}
+
+/* =================================================================
+   i18n DICTIONARY
+================================================================= */
+let currentLang = 'en';
+const T = {
+  en:{
+    brand_sub:"Credit-Readiness Copilot",
+    pill_know:"Know · Plan · Execute", pill_chat:"Talking to Disha…", pill_results:"Your results",
+    hero_eyebrow:"For 63M Indian MSMEs",
+    hero_h1:'Know which lender says <em>yes</em> — before you ever apply.',
+    hero_lede:'Meet <b>Disha</b>, your AI credit advisor. Answer a few questions in 90 seconds and get a live Financial Health Card, a real-time match across our lender panel, and an exact plan to unlock more approvals — no rejections, no guesswork.',
+    cta_check:"Check my readiness — free →", cta_how:"How it works",
+    meta1:"Disbursed to MSMEs", meta2:"Banks & NBFCs on panel", meta3:"To your Health Card",
+    step1k:"01 · Know", step1h:"Talk to Disha", step1p:"A natural conversation captures your profile — no 14-page form, no document upload to start.",
+    step2k:"02 · Plan", step2h:"See your matches", step2p:"A transparent Credit-Readiness Score and a lender-by-lender verdict: who approves, who doesn't, and why.",
+    step3k:"03 · Execute", step3h:"Unlock more lenders", step3p:'A prioritised Path-to-Approval shows the exact moves that turn a "no" into a "yes" — in days, not months.',
+    res_title:"Your Financial Health Card", restart:"↻ Start over",
+    p_score_h:"Credit-Readiness Score", p_score_s:"Weighted across 6 lending dimensions",
+    p_dims_h:"What's driving your score", p_dims_s:"Strengths and gaps, lender-grade",
+    p_lenders_h:"Lender Match Board", p_path_h:"Your Path to Approval", p_path_s:"Prioritised by lenders unlocked — the oneNDF difference",
+    p_lead_h:"Qualified-Lead Handoff", p_lead_s:"Auto-generated for the oneNDF Relationship Manager",
+    lead_next_k:"Recommended next action", copy_btn:"⧉ Copy lead summary to CRM", copy_done:"✓ Copied to clipboard",
+    disclaimer:'Demo build. Lender names and eligibility thresholds shown here are <b>illustrative</b> for product demonstration and do not represent live underwriting policy. Scores are computed by a transparent, rules-based engine — in production this is enriched with bureau (Experian), GST, and bank-statement APIs, and validated against live lender criteria.',
+    foot_left:"oneNDF · Credit-Readiness Copilot — concept prototype",
+    filt_all:"All", filt_likely:"✓ Likely", filt_border:"~ Borderline", filt_unlikely:"✕ Not now",
+    lender_sub:"{likely} likely · {border} borderline · {no} not now",
+    st_likely:"Likely Approve", st_border:"Borderline", st_unlikely:"Not now", fit:"% fit",
+    nobucket:"No lenders in this bucket.",
+    prog_start:"Getting started…", prog_mid:"Profiling your business…", prog_build:"Building your card…",
+    finish_msg:"Done! Your Financial Health Card is ready 🎉 Scroll down →",
+    nogaps:"You're already in great shape — no blocking gaps. Proceed to log your file with your matched lenders.",
+    g_unlock:"↑ unlocks {n} more lender{s}", g_score:"+{n} score", g_strength:"strengthens your file",
+    // grades
+    gradeA_t:"Highly Credit-Ready", gradeA_d:"You clear the bar for prime banks. Log your file with confidence.",
+    gradeB_t:"Credit-Ready", gradeB_d:"Strong profile — multiple lenders will engage. A small tune-up gets you better pricing.",
+    gradeC_t:"Conditionally Ready", gradeC_d:"You have real options, but fix the gaps below before logging to avoid a rejection on file.",
+    gradeD_t:"Needs Readiness Work", gradeD_d:"Don't apply yet — follow the Path to Approval first. A rejection now hurts future eligibility.",
+    grade_label:"Grade",
+    // dims
+    dim_repay:"Repayment Capacity", dim_bureau:"Credit Bureau", dim_coll_lap:"Collateral Coverage (LTV)", dim_coll_cf:"Cash-flow Strength", dim_vint:"Business Vintage", dim_bank:"Banking Discipline", dim_doc:"Documentation Completeness",
+    // lender reasons
+    rsn_all:"Meets all core criteria", rsn_close:"Close on: {x}", rsn_gaps:"Gaps: {x}", rsn_below:"Below threshold: {x}", rsn_nooffer:"Doesn't offer {x}",
+    rate_up:"upto",
+    // lead rows
+    lr_product:"Product / Ask", lr_readiness:"Readiness", lr_matches:"Lender matches", lr_best:"Best-fit lenders", lr_foir:"FOIR", lr_ltv:"LTV", lr_cibil:"CIBIL band", lr_to:"Turnover / Vintage", lr_gst:"GST",
+    lr_matches_v:"{likely} likely, {border} borderline", to_pull:"To be pulled", gst_yes:"Registered", gst_no:"Not registered",
+    disp_hot:"Hot Lead", disp_warm_ready:"Warm — Ready", disp_warm_cond:"Warm — Conditional", disp_nurture:"Nurture",
+    lead_next_p0:"Fast-track to top 3 matched lenders. Collect KYC + property papers and log files today — high conversion probability.",
+    lead_next_p1:"Confirm matched-lender docs, then log with the 2 best-fit lenders. Pre-empt one likely query (FOIR/LTV) before submission.",
+    lead_next_p2:"Walk the borrower through the Path-to-Approval. Re-score in 3–4 weeks; nurture before logging to avoid a rejection on file.",
+    lead_next_p3:"Do not log yet — a rejection now hurts future eligibility. Enrol in readiness coaching and revisit after the top 2 actions are done.",
+    // path fixes
+    fix_emi_t:"Reduce your monthly obligations",
+    fix_emi_d:"Prepay or close existing EMIs worth ~{cut}/month. This eases your FOIR (currently {foir}%) toward the ~45% comfort band banks look for.",
+    fix_ltv_t:"Right-size the ask to a 60% LTV",
+    fix_ltv_d:"Trim the loan to {amt} (or pledge a higher-value property). Lower LTV de-risks the file and opens conservative banks like Std. Chartered & Deutsche.",
+    fix_size_t:"Right-size the ask to what cash-flow supports",
+    fix_size_d:"At your current cash-flow, a loan around {amt} is comfortably serviceable. A smaller, affordable ask is far more likely to clear than an over-sized one.",
+    fix_cibil_t:"Lift your CIBIL into the {band} band",
+    fix_cibil_d:"Clear overdues, keep card utilisation under 30%, and avoid new hard enquiries for 60–90 days. Moving up a band re-rates you with prime lenders and trims your interest rate.",
+    fix_gst_t:"Register for GST / share 12-month returns",
+    fix_gst_d:"GST filings are mandatory for most bank programmes. Adding them makes you \"bankable\" and opens the lower-rate bank panel.",
+    fix_bank_t:"Strengthen your banking conduct",
+    fix_bank_d:"Maintain an average monthly balance of ~{amt} for 3 months and avoid cheque bounces — the first thing every underwriter reads.",
+    // gate
+    gate_eyebrow:"Welcome aboard", gate_title:"What should we call you?",
+    gate_sub:"Let's personalise your credit-readiness journey. Pop in your name to begin.",
+    gate_ph:"Your name…", gate_btn:"Enter oneNDF →", gate_skip:"Skip for now",
+    gate_welcome:"Welcome to oneNDF,", gate_welcome_sub:"Your AI credit advisor is getting things ready…",
+    // assistant
+    asst_fab:"Ask Disha", asst_ph:"Type your question…", asst_mode_demo:"Demo mode", asst_mode_live:"Live · Groq",
+    asst_greeting:"Hi {name}! 👋 I'm Disha, your oneNDF assistant. Ask me anything about getting your business loan approved, your readiness score, or how oneNDF works.",
+    asst_sugg1:"What is oneNDF?", asst_sugg2:"How can I improve my score?", asst_sugg3:"What is FOIR?", asst_sugg4:"Which lenders fit me?",
+    asst_err:"Sorry, I had trouble connecting just now. Please try again in a moment."
+  },
+  hi:{
+    brand_sub:"क्रेडिट-रेडीनेस कोपायलट",
+    pill_know:"जानें · प्लान · एग्ज़ीक्यूट", pill_chat:"दिशा से बातचीत…", pill_results:"आपके नतीजे",
+    hero_eyebrow:"भारत के 6.3 करोड़ MSMEs के लिए",
+    hero_h1:'अप्लाई करने से <em>पहले</em> ही जानें — कौन सा लेंडर हाँ कहेगा।',
+    hero_lede:'मिलिए <b>दिशा</b> से — आपकी AI क्रेडिट एडवाइज़र। 90 सेकंड में कुछ सवालों के जवाब दें और पाएँ लाइव फाइनेंशियल हेल्थ कार्ड, हमारे लेंडर पैनल पर रियल-टाइम मैच, और ज़्यादा अप्रूवल अनलॉक करने का सटीक प्लान — कोई रिजेक्शन नहीं, कोई अंदाज़ा नहीं।',
+    cta_check:"मेरी रेडीनेस जाँचें — मुफ़्त →", cta_how:"यह कैसे काम करता है",
+    meta1:"MSMEs को वितरित", meta2:"बैंक और NBFC पैनल पर", meta3:"आपके हेल्थ कार्ड तक",
+    step1k:"01 · जानें", step1h:"दिशा से बात करें", step1p:"एक सहज बातचीत आपकी प्रोफ़ाइल समझ लेती है — कोई 14-पन्नों का फॉर्म नहीं, शुरू करने के लिए कोई डॉक्युमेंट अपलोड नहीं।",
+    step2k:"02 · प्लान", step2h:"अपने मैच देखें", step2p:"एक पारदर्शी क्रेडिट-रेडीनेस स्कोर और हर लेंडर का फैसला: कौन अप्रूव करेगा, कौन नहीं, और क्यों।",
+    step3k:"03 · एग्ज़ीक्यूट", step3h:"और लेंडर अनलॉक करें", step3p:'एक प्राथमिकता-क्रम वाला Path-to-Approval वो सटीक कदम दिखाता है जो "ना" को "हाँ" में बदल दें — महीनों में नहीं, दिनों में।',
+    res_title:"आपका फाइनेंशियल हेल्थ कार्ड", restart:"↻ फिर से शुरू करें",
+    p_score_h:"क्रेडिट-रेडीनेस स्कोर", p_score_s:"6 लेंडिंग आयामों पर भारित",
+    p_dims_h:"आपके स्कोर के पीछे क्या है", p_dims_s:"ताक़त और कमियाँ, लेंडर-स्तर पर",
+    p_lenders_h:"लेंडर मैच बोर्ड", p_path_h:"आपका Path to Approval", p_path_s:"अनलॉक हुए लेंडरों के अनुसार प्राथमिकता — यही oneNDF का फ़र्क है",
+    p_lead_h:"क्वालिफ़ाइड-लीड हैंडऑफ़", p_lead_s:"oneNDF रिलेशनशिप मैनेजर के लिए स्वतः-तैयार",
+    lead_next_k:"सुझाई गई अगली कार्रवाई", copy_btn:"⧉ लीड समरी CRM में कॉपी करें", copy_done:"✓ कॉपी हो गया",
+    disclaimer:'डेमो बिल्ड। यहाँ दिखाए गए लेंडर नाम और एलिजिबिलिटी थ्रेशोल्ड <b>केवल उदाहरण</b> हैं और लाइव अंडरराइटिंग नीति नहीं दर्शाते। स्कोर एक पारदर्शी, नियम-आधारित इंजन से गणना किए जाते हैं — प्रोडक्शन में इन्हें ब्यूरो (Experian), GST और बैंक-स्टेटमेंट APIs से समृद्ध किया जाता है।',
+    foot_left:"oneNDF · क्रेडिट-रेडीनेस कोपायलट — कॉन्सेप्ट प्रोटोटाइप",
+    filt_all:"सभी", filt_likely:"✓ संभावित", filt_border:"~ सीमावर्ती", filt_unlikely:"✕ अभी नहीं",
+    lender_sub:"{likely} संभावित · {border} सीमावर्ती · {no} अभी नहीं",
+    st_likely:"संभावित अप्रूवल", st_border:"सीमावर्ती", st_unlikely:"अभी नहीं", fit:"% मैच",
+    nobucket:"इस श्रेणी में कोई लेंडर नहीं।",
+    prog_start:"शुरू कर रहे हैं…", prog_mid:"आपका बिज़नेस प्रोफ़ाइल कर रहे हैं…", prog_build:"आपका कार्ड बना रहे हैं…",
+    finish_msg:"हो गया! आपका फाइनेंशियल हेल्थ कार्ड तैयार है 🎉 नीचे देखें →",
+    nogaps:"आप पहले से बढ़िया स्थिति में हैं — कोई रुकावट नहीं। अपने मैच हुए लेंडरों के साथ फाइल लॉग करें।",
+    g_unlock:"↑ {n} और लेंडर अनलॉक", g_score:"+{n} स्कोर", g_strength:"आपकी फाइल मज़बूत करता है",
+    gradeA_t:"अत्यधिक क्रेडिट-रेडी", gradeA_d:"आप प्रमुख बैंकों की शर्तें पूरी करते हैं। आत्मविश्वास से फाइल लॉग करें।",
+    gradeB_t:"क्रेडिट-रेडी", gradeB_d:"मज़बूत प्रोफ़ाइल — कई लेंडर रुचि लेंगे। थोड़ा सुधार बेहतर रेट दिलाएगा।",
+    gradeC_t:"शर्तों सहित तैयार", gradeC_d:"आपके पास वास्तविक विकल्प हैं, पर रिजेक्शन से बचने के लिए नीचे की कमियाँ पहले ठीक करें।",
+    gradeD_t:"रेडीनेस पर काम चाहिए", gradeD_d:"अभी अप्लाई न करें — पहले Path to Approval अपनाएँ। अभी रिजेक्शन भविष्य की पात्रता को नुक़सान पहुँचाएगा।",
+    grade_label:"ग्रेड",
+    dim_repay:"पुनर्भुगतान क्षमता", dim_bureau:"क्रेडिट ब्यूरो", dim_coll_lap:"कोलैटरल कवरेज (LTV)", dim_coll_cf:"कैश-फ़्लो ताक़त", dim_vint:"बिज़नेस पुरानापन", dim_bank:"बैंकिंग अनुशासन", dim_doc:"डॉक्युमेंटेशन पूर्णता",
+    rsn_all:"सभी मुख्य शर्तें पूरी", rsn_close:"क़रीब: {x}", rsn_gaps:"कमियाँ: {x}", rsn_below:"शर्त से नीचे: {x}", rsn_nooffer:"{x} ऑफ़र नहीं करता",
+    rate_up:"तक",
+    lr_product:"प्रोडक्ट / माँग", lr_readiness:"रेडीनेस", lr_matches:"लेंडर मैच", lr_best:"सबसे उपयुक्त लेंडर", lr_foir:"FOIR", lr_ltv:"LTV", lr_cibil:"CIBIL बैंड", lr_to:"टर्नओवर / पुरानापन", lr_gst:"GST",
+    lr_matches_v:"{likely} संभावित, {border} सीमावर्ती", to_pull:"बाद में लिया जाएगा", gst_yes:"रजिस्टर्ड", gst_no:"रजिस्टर्ड नहीं",
+    disp_hot:"हॉट लीड", disp_warm_ready:"वॉर्म — तैयार", disp_warm_cond:"वॉर्म — शर्तों सहित", disp_nurture:"नर्चर",
+    lead_next_p0:"टॉप 3 मैच लेंडरों को फ़ास्ट-ट्रैक करें। KYC + प्रॉपर्टी पेपर लें और आज ही फाइल लॉग करें — उच्च कन्वर्ज़न संभावना।",
+    lead_next_p1:"मैच लेंडर डॉक्युमेंट पुष्टि करें, फिर 2 सबसे उपयुक्त लेंडरों के साथ लॉग करें। सबमिशन से पहले एक संभावित प्रश्न (FOIR/LTV) हल करें।",
+    lead_next_p2:"उधारकर्ता को Path-to-Approval समझाएँ। 3–4 हफ़्ते में फिर स्कोर करें; रिजेक्शन से बचने के लिए लॉग से पहले नर्चर करें।",
+    lead_next_p3:"अभी लॉग न करें — रिजेक्शन भविष्य की पात्रता को नुक़सान पहुँचाएगा। रेडीनेस कोचिंग में नामांकित करें और टॉप 2 कार्रवाई के बाद दोबारा देखें।",
+    fix_emi_t:"अपनी मासिक देनदारियाँ घटाएँ",
+    fix_emi_d:"लगभग {cut}/महीना की मौजूदा EMIs प्री-पे या बंद करें। इससे आपका FOIR (अभी {foir}%) बैंकों के पसंदीदा ~45% बैंड की ओर आता है।",
+    fix_ltv_t:"माँग को 60% LTV तक सही करें",
+    fix_ltv_d:"लोन को {amt} तक कम करें (या अधिक मूल्य की प्रॉपर्टी गिरवी रखें)। कम LTV फाइल को सुरक्षित बनाता है और Std. Chartered व Deutsche जैसे बैंक खोलता है।",
+    fix_size_t:"माँग को कैश-फ़्लो के अनुसार सही करें",
+    fix_size_d:"आपके मौजूदा कैश-फ़्लो पर, लगभग {amt} का लोन आराम से चुकाया जा सकता है। एक छोटी, किफ़ायती माँग बड़ी माँग से कहीं ज़्यादा आसानी से पास होती है।",
+    fix_cibil_t:"अपना CIBIL {band} बैंड में लाएँ",
+    fix_cibil_d:"बकाया चुकाएँ, कार्ड उपयोग 30% से नीचे रखें, और 60–90 दिन नई हार्ड इन्क्वायरी से बचें। एक बैंड ऊपर जाना प्रमुख लेंडरों के साथ आपकी रेटिंग सुधारता है।",
+    fix_gst_t:"GST रजिस्टर करें / 12-महीने के रिटर्न साझा करें",
+    fix_gst_d:"अधिकांश बैंक प्रोग्राम के लिए GST फाइलिंग ज़रूरी है। इन्हें जोड़ने से आप \"बैंकेबल\" बनते हैं और कम-रेट बैंक पैनल खुलता है।",
+    fix_bank_t:"अपना बैंकिंग व्यवहार मज़बूत करें",
+    fix_bank_d:"3 महीने तक लगभग {amt} का औसत मासिक बैलेंस बनाए रखें और चेक बाउंस से बचें — हर अंडरराइटर सबसे पहले यही देखता है।",
+    gate_eyebrow:"आपका स्वागत है", gate_title:"हम आपको क्या कहकर बुलाएँ?",
+    gate_sub:"आइए आपकी क्रेडिट-रेडीनेस यात्रा को व्यक्तिगत बनाएँ। शुरू करने के लिए अपना नाम लिखें।",
+    gate_ph:"आपका नाम…", gate_btn:"oneNDF में प्रवेश करें →", gate_skip:"अभी छोड़ें",
+    gate_welcome:"oneNDF में स्वागत है,", gate_welcome_sub:"आपकी AI क्रेडिट एडवाइज़र सब कुछ तैयार कर रही है…",
+    asst_fab:"दिशा से पूछें", asst_ph:"अपना सवाल लिखें…", asst_mode_demo:"डेमो मोड", asst_mode_live:"लाइव · Groq",
+    asst_greeting:"नमस्ते {name}! 👋 मैं दिशा हूँ, आपकी oneNDF असिस्टेंट। बिज़नेस लोन अप्रूवल, अपने रेडीनेस स्कोर, या oneNDF कैसे काम करता है — कुछ भी पूछें।",
+    asst_sugg1:"oneNDF क्या है?", asst_sugg2:"मैं अपना स्कोर कैसे सुधारूँ?", asst_sugg3:"FOIR क्या है?", asst_sugg4:"मेरे लिए कौन से लेंडर?",
+    asst_err:"माफ़ करें, अभी कनेक्ट करने में दिक़्क़त हुई। कृपया थोड़ी देर में दोबारा कोशिश करें।"
+  }
+};
+function t(key){ return (T[currentLang] && T[currentLang][key]!==undefined)? T[currentLang][key] : (T.en[key]!==undefined?T.en[key]:key); }
+function tf(key,vars){ let s=t(key); for(const k in (vars||{})) s=s.replaceAll('{'+k+'}', vars[k]); return s; }
+function tfix(key,vars){ return tf(key,vars); } // used inside engine helpers
+
+/* =================================================================
+   CHAT FLOW (bilingual)
+================================================================= */
+const profile = {};
+let step = 0;
+const FLOW = [
+  {key:'intro',
+   bot_en:["Namaste {name}! 👋 I'm <b>Disha</b>, your oneNDF credit advisor.","In 2 minutes I'll show you which lenders will approve you now — and how to unlock the ones that won't yet. Shall we start?"],
+   bot_hi:["नमस्ते {name}! 👋 मैं <b>दिशा</b> हूँ — आपकी oneNDF क्रेडिट एडवाइज़र।","2 मिनट में बताऊँगी: कौन से लेंडर आपको अभी लोन देंगे, और जो नहीं दे रहे — उन्हें कैसे अनलॉक करें। शुरू करें?"],
+   type:'chip', opt_en:[{l:"Yes, let's go →",v:'go'}], opt_hi:[{l:"हाँ, चलिए →",v:'go'}]},
+
+  {key:'loanType',
+   bot_en:["Great! First — what type of loan do you need?"], bot_hi:["बढ़िया! सबसे पहले — आपको किस तरह का लोन चाहिए?"],
+   type:'chip',
+   opt_en:[{l:'Loan Against Property',v:'lap'},{l:'Business Loan',v:'business'},{l:'Working Capital',v:'wc'}],
+   opt_hi:[{l:'प्रॉपर्टी पर लोन (LAP)',v:'lap'},{l:'बिज़नेस लोन',v:'business'},{l:'वर्किंग कैपिटल',v:'wc'}],
+   set:v=>{profile.loanType=v; return ({lap:'Loan Against Property',business:'Business Loan',wc:'Working Capital'})[v];}},
+
+  {key:'amount',
+   bot_en:["How much do you need? Tap a chip or type your own."], bot_hi:["कितने का लोन चाहिए? चिप दबाएँ या खुद टाइप करें।"],
+   type:'num', prefix:'₹', hint_en:'Tip: 50L = 50,00,000 · 1Cr = 1,00,00,000', hint_hi:'टिप: 50L = 50,00,000 · 1Cr = 1,00,00,000',
+   quick:[{l:'₹25 L',v:2500000},{l:'₹50 L',v:5000000},{l:'₹1 Cr',v:10000000},{l:'₹2 Cr',v:20000000}],
+   set:v=>{profile.amount=v; return fmtINR(v);}},
+
+  {key:'propertyType', cond:()=>profile.loanType==='lap',
+   bot_en:["Which type of property will you pledge?"], bot_hi:["आप किस तरह की प्रॉपर्टी गिरवी रखेंगे?"],
+   type:'chip',
+   opt_en:[{l:'Residential',v:'residential'},{l:'Commercial',v:'commercial'},{l:'Industrial',v:'industrial'}],
+   opt_hi:[{l:'रेज़िडेंशियल',v:'residential'},{l:'कमर्शियल',v:'commercial'},{l:'इंडस्ट्रियल',v:'industrial'}],
+   set:v=>{profile.propertyType=v; return v.charAt(0).toUpperCase()+v.slice(1);}},
+
+  {key:'propertyValue', cond:()=>profile.loanType==='lap',
+   bot_en:["What's that property's current market value?"], bot_hi:["उस प्रॉपर्टी की आज की मार्केट वैल्यू कितनी होगी?"],
+   type:'num', prefix:'₹', hint_en:'Your current estimated market value', hint_hi:'अपनी मौजूदा अनुमानित मार्केट वैल्यू डालें',
+   quick:[{l:'₹1 Cr',v:10000000},{l:'₹2 Cr',v:20000000},{l:'₹3.5 Cr',v:35000000},{l:'₹5 Cr',v:50000000}],
+   set:v=>{profile.propertyValue=v; return fmtINR(v);}},
+
+  {key:'vintage',
+   bot_en:["How old is your business?"], bot_hi:["आपका बिज़नेस कितने साल पुराना है?"],
+   type:'chip',
+   opt_en:[{l:'Under 1 yr',v:0.5},{l:'1–2 yr',v:1.5},{l:'2–3 yr',v:2.5},{l:'3–5 yr',v:4},{l:'5+ yr',v:6}],
+   opt_hi:[{l:'1 साल से कम',v:0.5},{l:'1–2 साल',v:1.5},{l:'2–3 साल',v:2.5},{l:'3–5 साल',v:4},{l:'5+ साल',v:6}],
+   set:v=>{profile.vintageYears=v; return ({0.5:'Under 1 yr',1.5:'1–2 yr',2.5:'2–3 yr',4:'3–5 yr',6:'5+ yr'})[v];}},
+
+  {key:'turnover',
+   bot_en:["What was last year's annual turnover (total sales)?"], bot_hi:["पिछले साल का सालाना टर्नओवर (कुल बिक्री) कितना था?"],
+   type:'num', prefix:'₹', hint_en:'Sales/revenue, not profit', hint_hi:'बिक्री/रेवेन्यू, प्रॉफ़िट नहीं',
+   quick:[{l:'₹50 L',v:5000000},{l:'₹1 Cr',v:10000000},{l:'₹3 Cr',v:30000000},{l:'₹5 Cr+',v:50000000}],
+   set:v=>{profile.annualTurnover=v; return fmtINR(v)+(currentLang==='hi'?' / साल':' / yr');}},
+
+  {key:'gst',
+   bot_en:["Is your business GST registered and filing returns?"], bot_hi:["क्या आपका बिज़नेस GST रजिस्टर्ड है और रिटर्न फाइल करता है?"],
+   type:'chip',
+   opt_en:[{l:'Yes, GST filed',v:true},{l:'No / not yet',v:false}],
+   opt_hi:[{l:'हाँ, GST फाइल',v:true},{l:'नहीं / अभी नहीं',v:false}],
+   set:v=>{profile.gst=v; return v?(currentLang==='hi'?'GST रजिस्टर्ड':'GST registered'):(currentLang==='hi'?'अभी GST नहीं':'No GST yet');}},
+
+  {key:'avgBalance',
+   bot_en:["What's the average monthly balance in your main business account?"], bot_hi:["आपके मुख्य बिज़नेस अकाउंट का औसत मासिक बैलेंस कितना रहता है?"],
+   type:'num', prefix:'₹', hint_en:'Roughly — your month-long average', hint_hi:'लगभग — महीने भर का औसत',
+   quick:[{l:'₹1 L',v:100000},{l:'₹3 L',v:300000},{l:'₹8 L',v:800000},{l:'₹20 L',v:2000000}],
+   set:v=>{profile.avgBalance=v; return fmtINR(v)+(currentLang==='hi'?' औसत':' avg');}},
+
+  {key:'existingEmi',
+   bot_en:["How much total EMI do you pay every month (all existing loans)?"], bot_hi:["अभी आप हर महीने कुल कितनी EMI भरते हैं (सारे मौजूदा लोन मिलाकर)?"],
+   type:'num', prefix:'₹', hint_en:'If none, tap "No EMIs"', hint_hi:'अगर कोई लोन नहीं तो "No EMIs" दबाएँ',
+   quick:[{l:'No EMIs',v:0},{l:'₹50 K',v:50000},{l:'₹1 L',v:100000},{l:'₹2.5 L',v:250000}],
+   set:v=>{profile.existingEmi=v; return v===0?(currentLang==='hi'?'कोई EMI नहीं':'No existing EMIs'):fmtINR(v)+(currentLang==='hi'?' / महीना':' / month');}},
+
+  {key:'cibil',
+   bot_en:["Last one — what's your approximate CIBIL score?"], bot_hi:["आख़िरी सवाल — आपका अनुमानित CIBIL स्कोर क्या है?"],
+   type:'chip',
+   opt_en:[{l:'750+',v:'750+'},{l:'700–750',v:'700-750'},{l:'650–700',v:'650-700'},{l:'Below 650',v:'<650'},{l:"Don't know",v:'unknown'}],
+   opt_hi:[{l:'750+',v:'750+'},{l:'700–750',v:'700-750'},{l:'650–700',v:'650-700'},{l:'650 से कम',v:'<650'},{l:'पता नहीं',v:'unknown'}],
+   set:v=>{profile.cibilBand=v; return v==='unknown'?(currentLang==='hi'?'पता नहीं (हम ब्यूरो लेंगे)':"Don't know (we'll pull bureau)"):'CIBIL '+v;}}
+];
+
+function botLines(s){ return (currentLang==='hi'? s.bot_hi : s.bot_en).map(x=>x.replaceAll('{name}', USER_NAME?(' '+USER_NAME):'').replace(/\s+!/,'!')); }
+function botOpts(s){ return currentLang==='hi'? (s.opt_hi||s.opt_en) : s.opt_en; }
+function botHint(s){ return currentLang==='hi'? (s.hint_hi||s.hint_en) : s.hint_en; }
+
+function startChat(){
+  document.getElementById('screen-hero').classList.remove('active');
+  document.getElementById('screen-results').classList.remove('active');
+  document.getElementById('screen-chat').classList.add('active');
+  setPill('pill_chat');
+  document.getElementById('thread').innerHTML='';
+  step=0; for(const k in profile) delete profile[k];
+  window.scrollTo({top:0,behavior:'smooth'});
+  runStep();
+}
+function activeSteps(){ return FLOW.filter(s=> !s.cond || s.cond()); }
+function updateProgress(){
+  const total = activeSteps().length;
+  const done = activeSteps().filter((s)=> FLOW.indexOf(s) < step ).length;
+  const pct = Math.round(done/(total)*100);
+  document.getElementById('progBar').style.width = pct+'%';
+  document.getElementById('progPct').textContent = pct+'%';
+  document.getElementById('progText').textContent = pct>=100?t('prog_build'):(done<=1?t('prog_start'):t('prog_mid'));
+}
+function addMsg(text, who){
+  const el=document.getElementById('thread');
+  const d=document.createElement('div'); d.className='msg '+who;
+  if(who==='bot') d.innerHTML='<div class="who"><span class="dot"></span>'+(currentLang==='hi'?'दिशा':'Disha')+'</div>'+text;
+  else d.innerHTML=text;
+  el.appendChild(d); d.scrollIntoView({behavior:'smooth',block:'end'});
+  return d;
+}
+function showTyping(){
+  const el=document.getElementById('thread');
+  const d=document.createElement('div'); d.className='msg bot'; d.id='typing';
+  d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  el.appendChild(d); d.scrollIntoView({behavior:'smooth',block:'end'});
+}
+function hideTyping(){const e=document.getElementById('typing'); if(e)e.remove();}
+function runStep(){
+  while(step<FLOW.length && FLOW[step].cond && !FLOW[step].cond()) step++;
+  updateProgress();
+  if(step>=FLOW.length){ finish(); return; }
+  const s=FLOW[step];
+  document.getElementById('inputzone').innerHTML='';
+  const lines=botLines(s); let i=0;
+  const emit=()=>{
+    if(i>=lines.length){ renderInput(s); return; }
+    showTyping();
+    setTimeout(()=>{ hideTyping(); addMsg(lines[i], 'bot'); i++; setTimeout(emit, 220);}, 480+Math.random()*260);
+  };
+  emit();
+}
+function renderInput(s){
+  const z=document.getElementById('inputzone');
+  if(s.type==='chip'){
+    const wrap=document.createElement('div'); wrap.className='chips';
+    botOpts(s).forEach(o=>{
+      const b=document.createElement('button'); b.className='chip'; b.textContent=o.l;
+      b.onclick=()=>choose(s,o.v,o.l);
+      wrap.appendChild(b);
+    });
+    z.appendChild(wrap);
+  } else if(s.type==='num'){
+    const wrap=document.createElement('div');
+    const row=document.createElement('div'); row.className='numrow';
+    const box=document.createElement('div'); box.className='numinput';
+    box.innerHTML='<span>'+(s.prefix||'')+'</span>';
+    const inp=document.createElement('input'); inp.type='text'; inp.inputMode='numeric'; inp.placeholder=currentLang==='hi'?'राशि टाइप करें…':'Type amount…';
+    inp.oninput=()=>{ let raw=inp.value.replace(/[^0-9]/g,''); inp.value= raw? Number(raw).toLocaleString('en-IN'):''; };
+    box.appendChild(inp);
+    const go=document.createElement('button'); go.className='btn btn-primary'; go.textContent=currentLang==='hi'?'आगे →':'Next →';
+    go.onclick=()=>{ const v=Number(inp.value.replace(/[^0-9]/g,'')); if(v>0) choose(s,v,null); else inp.focus(); };
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')go.click();});
+    row.appendChild(box); row.appendChild(go); wrap.appendChild(row);
+    const chips=document.createElement('div'); chips.className='chips'; chips.style.marginTop='12px';
+    (s.quick||[]).forEach(q=>{ const c=document.createElement('button'); c.className='chip'; c.textContent=q.l; c.onclick=()=>choose(s,q.v,null); chips.appendChild(c);});
+    wrap.appendChild(chips);
+    const hint=botHint(s); if(hint){const h=document.createElement('div'); h.className='numhint'; h.textContent=hint; wrap.appendChild(h);}
+    z.appendChild(wrap);
+    setTimeout(()=>inp.focus(),100);
+  }
+}
+function choose(s, value, label){
+  const disp = s.set? s.set(value) : (label||String(value));
+  addMsg(disp, 'user');
+  document.getElementById('inputzone').innerHTML='';
+  step++;
+  setTimeout(runStep, 280);
+}
+
+let LAST=null;
+function finish(){
+  document.getElementById('progBar').style.width='100%';
+  document.getElementById('progPct').textContent='100%';
+  document.getElementById('progText').textContent=t('prog_build');
+  showTyping();
+  setTimeout(()=>{ hideTyping(); addMsg(t('finish_msg'),'bot');
+    setTimeout(renderResults, 700);
+  }, 900);
+}
+
+function gradeOf(s){
+  if(s>=80) return {g:'A',tk:'gradeA_t',dk:'gradeA_d',gc:'var(--emerald)',tier:'good'};
+  if(s>=65) return {g:'B',tk:'gradeB_t',dk:'gradeB_d',gc:'var(--emerald)',tier:'good'};
+  if(s>=50) return {g:'C',tk:'gradeC_t',dk:'gradeC_d',gc:'var(--amber)',tier:'mid'};
+  return {g:'D',tk:'gradeD_t',dk:'gradeD_d',gc:'var(--red)',tier:'low'};
+}
+function dimLabel(d){
+  let base;
+  if(d.key==='coll') base = d.collKind==='lap'? t('dim_coll_lap') : t('dim_coll_cf');
+  else base = t('dim_'+d.key);
+  return base + (d.meta? ' ('+d.meta+')':'');
+}
+function lenderReason(l){
+  if(l.reasonKey==='all') return t('rsn_all');
+  if(l.reasonKey==='nooffer') return tf('rsn_nooffer',{x:l.cfg?l.cfg.label:l.reasonArg});
+  return tf('rsn_'+l.reasonKey,{x:l.reasonArg});
+}
+
+function renderResults(){
+  const base = analyze(profile);
+  LAST = {profile:{...profile}, base};
+  document.getElementById('screen-chat').classList.remove('active');
+  document.getElementById('screen-results').classList.add('active');
+  setPill('pill_results');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  document.getElementById('profileLine').innerHTML =
+    base.cfg.label+' · '+fmtINR(profile.amount)+' · '+profile.vintageYears+(currentLang==='hi'?' साल':'y')+' · '+fmtINR(profile.annualTurnover)+(currentLang==='hi'?'/साल':'/yr');
+
+  const s=base.score; const G=gradeOf(s);
+  const chip=document.getElementById('gradeChip');
+  chip.textContent=t('grade_label')+' '+G.g;
+  chip.style.background= s>=65?'var(--emerald-tint)': s>=50?'var(--amber-tint)':'var(--red-tint)';
+  chip.style.color= s>=65?'var(--emerald-deep)': s>=50?'var(--amber)':'var(--red)';
+  document.getElementById('gradeTitle').textContent=t(G.tk);
+  document.getElementById('gradeDesc').textContent=t(G.dk);
+
+  const arc=document.getElementById('dialArc'); arc.setAttribute('stroke',G.gc);
+  const C=402; let cur=0; const target=s; const numEl=document.getElementById('scoreNum');
+  const anim=setInterval(()=>{ cur+=Math.max(1,Math.round((target-cur)/6)); if(cur>=target)cur=target;
+    numEl.textContent=cur; arc.style.strokeDashoffset = C - C*(cur/100);
+    if(cur>=target)clearInterval(anim);
+  },28);
+
+  const dimsEl=document.getElementById('dims'); dimsEl.innerHTML='';
+  base.dims.forEach(d=>{
+    const col = d.val>=70?'var(--emerald)': d.val>=45?'var(--amber)':'var(--red)';
+    const row=document.createElement('div'); row.className='dim';
+    row.innerHTML='<div class="dl"><span>'+dimLabel(d)+'</span><span>'+d.val+'</span></div><div class="track"><i style="background:'+col+';width:0"></i></div>';
+    dimsEl.appendChild(row);
+    requestAnimationFrame(()=>setTimeout(()=>{row.querySelector('i').style.width=d.val+'%';},120));
+  });
+
+  document.getElementById('lenderSub').textContent = tf('lender_sub',{likely:base.likely,border:base.border,no:(base.lenders.length-base.likely-base.border)});
+  renderLenders('all');
+  const fb=document.getElementById('filterbar'); fb.innerHTML='';
+  [['all','filt_all'],['likely','filt_likely'],['border','filt_border'],['unlikely','filt_unlikely']].forEach((f,idx)=>{
+    const b=document.createElement('button'); b.className='fbtn'+(idx===0?' on':''); b.textContent=t(f[1]);
+    b.onclick=()=>{document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderLenders(f[0]);};
+    fb.appendChild(b);
+  });
+
+  const path=buildPath(profile, base);
+  const pl=document.getElementById('pathList'); pl.innerHTML='';
+  if(path.length===0){ pl.innerHTML='<p style="color:var(--slate);font-size:14.5px">'+t('nogaps')+'</p>'; }
+  path.forEach((a,i)=>{
+    const d=document.createElement('div'); d.className='action';
+    let gains='';
+    if(a.unlocked>0) gains+='<b>'+tf('g_unlock',{n:a.unlocked,s:a.unlocked>1?(currentLang==='hi'?'':'s'):''})+'</b>';
+    if(a.scoreGain>0) gains+='<b class="amber">'+tf('g_score',{n:a.scoreGain})+'</b>';
+    if(!gains) gains='<b class="amber">'+t('g_strength')+'</b>';
+    d.innerHTML='<div class="anum">'+(i+1)+'</div><div><div class="at">'+tf(a.tkey, a.tkeyArg||{})+'</div><div class="ad">'+a.desc+'</div><div class="gain">'+gains+'</div></div>';
+    pl.appendChild(d);
+  });
+
+  const lead=buildLead(profile, base);
+  document.getElementById('leadPrio').textContent=lead.prio+' · '+t(lead.dispKey);
+  const dispEl=document.getElementById('leadDisp'); dispEl.textContent=t(lead.dispKey); dispEl.style.background=lead.dispColor; dispEl.style.color='#062018';
+  const lg=document.getElementById('leadGrid'); lg.innerHTML='';
+  const rows=[
+    [t('lr_product'), base.cfg.label+' · '+fmtINR(profile.amount)],
+    [t('lr_readiness'), base.score+'/100 ('+t('grade_label')+' '+G.g+')'],
+    [t('lr_matches'), tf('lr_matches_v',{likely:base.likely,border:base.border})],
+    [t('lr_best'), lead.topLenders],
+    [t('lr_foir'), (base.foir*100).toFixed(0)+'%'],
+    [t('lr_cibil'), profile.cibilBand==='unknown'?t('to_pull'):profile.cibilBand],
+    [t('lr_to'), fmtINR(profile.annualTurnover)+' · '+profile.vintageYears+(currentLang==='hi'?'स':'y')],
+    [t('lr_gst'), profile.gst?t('gst_yes'):t('gst_no')]
+  ];
+  if(base.ltv!=null) rows.splice(5,0,[t('lr_ltv'),(base.ltv*100).toFixed(0)+'%']);
+  rows.forEach(r=>{const d=document.createElement('div');d.className='lg';d.innerHTML='<div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div>';lg.appendChild(d);});
+  document.getElementById('leadNext').textContent=t(lead.nextKey);
+}
+
+function renderLenders(filter){
+  const base=LAST.base;
+  const el=document.getElementById('lenderList'); el.innerHTML='';
+  const list = base.lenders.filter(l=> filter==='all'?true:l.status===filter);
+  if(list.length===0){el.innerHTML='<p style="color:var(--slate);padding:14px 4px;font-size:14px">'+t('nobucket')+'</p>';return;}
+  list.forEach(l=>{
+    const cls=l.status==='likely'?'s-likely':l.status==='border'?'s-border':'s-unlikely';
+    const txt=l.status==='likely'?t('st_likely'):l.status==='border'?t('st_border'):t('st_unlikely');
+    const initials=l.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const rateStr = l.offers? l.rateLo.toFixed(2)+'–'+l.rateHi.toFixed(2)+'% · '+t('rate_up')+' '+fmtINR(l.eligible) : '—';
+    const reason = lenderReason({...l, cfg:base.cfg});
+    const d=document.createElement('div'); d.className='lender';
+    d.innerHTML=
+      '<div class="lavatar" style="background:'+l.color+'">'+initials+'</div>'+
+      '<div class="linfo"><div class="ln">'+l.name+' <span class="ltype">'+l.type+'</span></div>'+
+      '<div class="lr">'+reason+(l.offers?' · '+rateStr:'')+'</div></div>'+
+      '<div class="lright"><span class="status '+cls+'">'+txt+'</span>'+(l.offers?'<div class="matchpct">'+l.matchPct+t('fit')+'</div>':'')+'</div>';
+    el.appendChild(d);
+  });
+}
+
+function copyLead(){
+  const b=LAST.base, p=LAST.profile, lead=buildLead(p,b), G=gradeOf(b.score);
+  const txt=
+`oneNDF — QUALIFIED LEAD (auto-generated)
+Borrower    : ${USER_NAME||'—'}
+Priority    : ${lead.prio} | Disposition: ${t(lead.dispKey)}
+------------------------------------------
+Product/Ask : ${b.cfg.label} — ${fmtINR(p.amount)}
+Readiness   : ${b.score}/100 (Grade ${G.g})
+Matches     : ${b.likely} likely, ${b.border} borderline
+Best-fit    : ${lead.topLenders}
+FOIR        : ${(b.foir*100).toFixed(0)}%${b.ltv!=null?' | LTV: '+(b.ltv*100).toFixed(0)+'%':''}
+CIBIL       : ${p.cibilBand}
+Turnover    : ${fmtINR(p.annualTurnover)}/yr | Vintage: ${p.vintageYears}y | GST: ${p.gst?'Yes':'No'}
+------------------------------------------
+NEXT ACTION : ${t(lead.nextKey)}`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.getElementById('copyBtn'); btn.textContent=t('copy_done');
+    setTimeout(()=>btn.textContent=t('copy_btn'),1800);
+  });
+}
+function restart(){
+  document.getElementById('screen-results').classList.remove('active');
+  document.getElementById('screen-hero').classList.add('active');
+  setPill('pill_know');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* =================================================================
+   i18n APPLY + THEME + LANGUAGE
+================================================================= */
+let pillKey='pill_know';
+function setPill(k){ pillKey=k; document.getElementById('headerPill').textContent=t(k); }
+function applyLang(lang){
+  currentLang=lang;
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML=t(el.getAttribute('data-i18n-html')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder=t(el.getAttribute('data-i18n-ph')); });
+  document.getElementById('headerPill').textContent=t(pillKey);
+  document.querySelectorAll('#langSeg button, #gateLangSeg button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-lang')===lang));
+  // refresh dynamic screens if visible
+  if(document.getElementById('screen-results').classList.contains('active') && LAST){ renderResults(); }
+  refreshWelcomeLine();
+  // assistant greeting refresh if empty
+}
+function setTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  const icon = theme==='dark'?'☀️':'🌙';
+  document.getElementById('themeBtn').textContent=icon;
+  document.getElementById('gateTheme').textContent=icon;
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  setTheme(cur==='dark'?'light':'dark');
+}
+
+/* =================================================================
+   NAME GATE + CELEBRATION
+================================================================= */
+let USER_NAME='';
+function refreshWelcomeLine(){
+  const wl=document.getElementById('welcomeLine');
+  if(wl) wl.innerHTML = t('gate_welcome')+' <em>'+(USER_NAME||'oneNDF')+'</em>!';
+}
+function enterSite(name){
+  USER_NAME = (name||'').trim().replace(/<[^>]*>/g,'').slice(0,40);
+  refreshWelcomeLine();
+  document.getElementById('gateForm').style.display='none';
+  document.getElementById('celebrate').classList.add('show');
+  launchCelebration();
+  setTimeout(()=>{ document.getElementById('gate').classList.add('gone'); }, 3600);
+  setTimeout(()=>{ document.getElementById('gate').style.display='none'; resetAssistant(); }, 4400);
+}
+/* confetti + balloons */
+function launchCelebration(){
+  const canvas=document.getElementById('confetti'); const ctx=canvas.getContext('2d');
+  let W=canvas.width=innerWidth, H=canvas.height=innerHeight;
+  const colors=['#0E6E4E','#27C08A','#D9921A','#EAB44A','#B23B2E','#FF6B5E','#FAF6EE'];
+  const parts=[];
+  for(let i=0;i<180;i++){
+    parts.push({x:Math.random()*W, y:Math.random()*-H, w:6+Math.random()*7, h:8+Math.random()*9,
+      c:colors[(Math.random()*colors.length)|0], vy:2+Math.random()*4, vx:-2+Math.random()*4,
+      rot:Math.random()*6.28, vr:-.2+Math.random()*.4});
+  }
+  // balloons
+  const balloonColors=['#0E6E4E','#D9921A','#27C08A','#B23B2E','#486AAE','#C8102E'];
+  for(let i=0;i<10;i++){
+    const b=document.createElement('div'); b.className='balloon';
+    b.style.left=(5+Math.random()*90)+'vw';
+    b.style.background=balloonColors[i%balloonColors.length];
+    b.style.animationDuration=(3.4+Math.random()*2.2)+'s';
+    b.style.animationDelay=(Math.random()*.8)+'s';
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(), 6500);
+  }
+  const start=Date.now();
+  (function frame(){
+    const t=Date.now()-start;
+    ctx.clearRect(0,0,W,H);
+    parts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.04; p.rot+=p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    });
+    if(t<3500) requestAnimationFrame(frame);
+    else ctx.clearRect(0,0,W,H);
+  })();
+}
+
+/* =================================================================
+   LIVE ASSISTANT (Groq via Render proxy, with smart demo fallback)
+================================================================= */
+const ASSISTANT = {
+  // Recommended (secure): a backend proxy you deploy on Render that holds GROQ_API_KEY.
+  // The included server.js exposes exactly this route. Leave as-is for Render.
+  endpoint: './api/chat',
+  // Quick/insecure direct test only: paste a Groq key here to call Groq from the browser.
+  // (Exposes the key in page source — fine for a throwaway demo, NOT for production.)
+  groqKeyDirect: '',
+  model: 'llama-3.3-70b-versatile'
+};
+let asstHistory=[]; let asstLive=false;
+function resetAssistant(){
+  asstHistory=[];
+  const body=document.getElementById('asstBody'); body.innerHTML='';
+  asstAdd(tf('asst_greeting',{name:USER_NAME||(currentLang==='hi'?'दोस्त':'there')}), 'bot');
+  const sg=document.getElementById('asstSugg'); sg.innerHTML='';
+  ['asst_sugg1','asst_sugg2','asst_sugg3','asst_sugg4'].forEach(k=>{
+    const b=document.createElement('button'); b.textContent=t(k);
+    b.onclick=()=>{ document.getElementById('asstInput').value=t(k); sendAsst(); };
+    sg.appendChild(b);
+  });
+}
+function asstAdd(text,who){
+  const body=document.getElementById('asstBody');
+  const d=document.createElement('div'); d.className='asst-msg '+who; d.innerHTML=text;
+  body.appendChild(d); body.scrollTop=body.scrollHeight; return d;
+}
+function asstTyping(on){
+  const body=document.getElementById('asstBody');
+  if(on){ const d=document.createElement('div'); d.className='asst-msg bot'; d.id='asstTyping';
+    d.innerHTML='<div class="asst-typing"><span></span><span></span><span></span></div>'; body.appendChild(d); body.scrollTop=body.scrollHeight; }
+  else { const e=document.getElementById('asstTyping'); if(e)e.remove(); }
+}
+function systemPrompt(){
+  let ctx = `You are Disha, the friendly, concise AI assistant for oneNDF — an India-based, API-first secured-loan marketplace for MSMEs (LAP, business loans, working capital). oneNDF builds a Financial Health Card and matches borrowers to 100+ banks/NBFCs so they avoid lender rejections. Framework: Know, Plan, Execute. Answer in ${currentLang==='hi'?'Hindi (Devanagari), warm and simple':'clear English'}. Keep replies under 90 words. Use Indian finance terms (CIBIL, FOIR, LTV, GST, EMI). Be encouraging and practical. If asked something unrelated to credit/loans/oneNDF, gently steer back.`;
+  if(window.LAST && LAST.base){
+    const b=LAST.base, p=LAST.profile, G=gradeOf(b.score);
+    ctx += ` The user${USER_NAME?(' ('+USER_NAME+')'):''} just completed a check: product ${b.cfg.label}, ask ${fmtINR(p.amount)}, readiness ${b.score}/100 (Grade ${G.g}), FOIR ${(b.foir*100).toFixed(0)}%, ${b.likely} likely + ${b.border} borderline lenders. Reference this when relevant.`;
+  } else if(USER_NAME){ ctx += ` The user's name is ${USER_NAME}.`; }
+  return ctx;
+}
+async function callGroqDirect(messages){
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+ASSISTANT.groqKeyDirect},
+    body:JSON.stringify({model:ASSISTANT.model, messages, max_tokens:350, temperature:0.6})
+  });
+  if(!res.ok) throw new Error('groq '+res.status);
+  const data=await res.json(); return data.choices[0].message.content.trim();
+}
+async function callProxy(messages){
+  const res=await fetch(ASSISTANT.endpoint,{ method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({messages, model:ASSISTANT.model}) });
+  if(!res.ok) throw new Error('proxy '+res.status);
+  const data=await res.json();
+  return (data.reply || (data.choices&&data.choices[0].message.content) || '').trim();
+}
+function setAsstMode(live){
+  asstLive=live;
+  document.getElementById('asstStatus').textContent = live? t('asst_mode_live') : t('asst_mode_demo');
+}
+async function sendAsst(){
+  const inp=document.getElementById('asstInput'); const q=inp.value.trim(); if(!q) return;
+  inp.value=''; asstAdd(q.replace(/</g,'&lt;'),'user'); asstHistory.push({role:'user',content:q});
+  asstTyping(true);
+  const messages=[{role:'system',content:systemPrompt()}, ...asstHistory.slice(-8)];
+  try{
+    let reply;
+    if(ASSISTANT.groqKeyDirect){ reply=await callGroqDirect(messages); setAsstMode(true); }
+    else { reply=await callProxy(messages); setAsstMode(true); }
+    asstTyping(false);
+    asstHistory.push({role:'assistant',content:reply});
+    asstAdd(reply.replace(/</g,'&lt;').replace(/\n/g,'<br>'),'bot');
+  }catch(e){
+    asstTyping(false); setAsstMode(false);
+    const fb=localAnswer(q); asstHistory.push({role:'assistant',content:fb});
+    asstAdd(fb,'bot');
+  }
+}
+/* Rule-based fallback so the assistant is genuinely useful with zero setup */
+function localAnswer(qRaw){
+  const q=qRaw.toLowerCase(); const hi=currentLang==='hi';
+  const has=(...a)=>a.some(w=>q.includes(w));
+  if(has('onendf','one ndf','about','क्या है','कंपनी'))
+    return hi? 'oneNDF एक AI/API-आधारित सिक्योर्ड-लोन मार्केटप्लेस है जो MSMEs को 100+ बैंक/NBFC से जोड़ता है। हम पहले आपका फाइनेंशियल हेल्थ कार्ड बनाते हैं, फिर सही लेंडर से मैच करते हैं — ताकि रिजेक्शन न हो। हमारा तरीक़ा: जानें · प्लान · एग्ज़ीक्यूट।'
+            : 'oneNDF is an AI/API-first secured-loan marketplace that connects MSMEs to 100+ banks & NBFCs. We build your Financial Health Card first, then match you to the right lender — so you avoid rejections. Our framework is Know · Plan · Execute.';
+  if(has('foir'))
+    return hi? 'FOIR यानी Fixed Obligation to Income Ratio — आपकी कुल EMI ÷ आपकी आय। बैंक आमतौर पर ~45–55% तक पसंद करते हैं। कम FOIR = ज़्यादा अप्रूवल चांस। इसे घटाने के लिए मौजूदा EMIs कम करें या लोन राशि सही करें।'
+            : 'FOIR (Fixed Obligation to Income Ratio) = your total EMIs ÷ income. Banks usually like it under ~45–55%. A lower FOIR means a higher approval chance — reduce existing EMIs or right-size the loan to improve it.';
+  if(has('ltv'))
+    return hi? 'LTV (Loan-to-Value) = लोन राशि ÷ प्रॉपर्टी वैल्यू। 60% या कम LTV फाइल को सुरक्षित बनाता है और conservative बैंक खोलता है।'
+            : 'LTV (Loan-to-Value) = loan amount ÷ property value. An LTV of 60% or lower de-risks your file and opens conservative banks like Standard Chartered & Deutsche.';
+  if(has('cibil','credit score'))
+    return hi? 'CIBIL आपका क्रेडिट स्कोर है (300–900)। 750+ सबसे अच्छा रेट दिलाता है। सुधारने के लिए: बकाया चुकाएँ, कार्ड उपयोग 30% से कम रखें, और नई इन्क्वायरी से बचें।'
+            : 'CIBIL is your credit score (300–900). 750+ gets the best rates. To improve: clear overdues, keep card utilisation under 30%, and avoid new hard enquiries for 60–90 days.';
+  if(has('msme','sme'))
+    return hi? 'MSME = सूक्ष्म, लघु और मध्यम उद्यम — भारत की रीढ़। ये GDP में ~30% योगदान देते हैं पर अक्सर क्रेडिट से वंचित रहते हैं। oneNDF इसी गैप को पाटता है।'
+            : 'MSME = Micro, Small & Medium Enterprises — the backbone of India, contributing ~30% of GDP but often locked out of formal credit. oneNDF bridges exactly that gap.';
+  if(has('improve','better','score badhao','सुधार','बढ़ा')){
+    if(window.LAST){ const b=LAST.base;
+      return hi? `आपका स्कोर ${b.score}/100 है। सबसे तेज़ सुधार: ${b.foir>0.5?'मौजूदा EMIs घटाएँ (FOIR कम करें), ':''}CIBIL एक बैंड ऊपर लाएँ${LAST.profile.gst?'':', और GST रजिस्टर करें'}। नीचे "Path to Approval" में सटीक कदम दिए हैं।`
+              : `Your score is ${b.score}/100. Fastest wins: ${b.foir>0.5?'reduce existing EMIs (lower FOIR), ':''}lift CIBIL one band${LAST.profile.gst?'':', and register for GST'}. See your exact steps in the "Path to Approval" panel below.`;
+    }
+    return hi? 'पहले ऊपर "मेरी रेडीनेस जाँचें" से अपना कार्ड बनाएँ — फिर मैं आपके आँकड़ों के हिसाब से सटीक कदम बता सकती हूँ। आम तौर पर: FOIR कम करें, CIBIL बढ़ाएँ, GST जोड़ें।'
+            : 'First build your card via "Check my readiness" above — then I can give exact steps for your numbers. Generally: lower your FOIR, lift CIBIL, and add GST filings.';
+  }
+  if(has('lender','bank','match','कौन','लेंडर')){
+    if(window.LAST){ const b=LAST.base; const names=b.lenders.filter(l=>l.status!=='unlikely').slice(0,3).map(l=>l.name).join(', ');
+      return hi? `आपकी प्रोफ़ाइल पर ${b.likely} लेंडर संभावित और ${b.border} सीमावर्ती हैं। सबसे उपयुक्त: ${names||'—'}। पूरा ब्रेकडाउन "Lender Match Board" में देखें।`
+              : `On your profile, ${b.likely} lenders are likely and ${b.border} borderline. Best-fit: ${names||'—'}. See the full breakdown in the "Lender Match Board".`;
+    }
+    return hi? 'अपना कार्ड बनाएँ और मैं आपके लिए मैच हुए लेंडर दिखाऊँगी — हर एक का कारण, अनुमानित रेट और पात्र राशि के साथ।'
+            : 'Build your card and I\'ll show your matched lenders — each with the reason, estimated rate, and eligible amount.';
+  }
+  if(has('how','kaise','कैसे','work'))
+    return hi? 'आसान है: 1) दिशा से 90 सेकंड बात करें, 2) अपना रेडीनेस स्कोर और लेंडर मैच देखें, 3) Path to Approval अपनाकर और लेंडर अनलॉक करें। ऊपर "मेरी रेडीनेस जाँचें" दबाएँ।'
+            : 'Simple: 1) chat with Disha for 90 seconds, 2) see your readiness score and lender matches, 3) follow the Path to Approval to unlock more lenders. Tap "Check my readiness" above to start.';
+  if(has('hi','hello','hey','namaste','नमस्ते','हाय'))
+    return hi? `नमस्ते${USER_NAME?' '+USER_NAME:''}! मैं आपके बिज़नेस लोन में कैसे मदद करूँ?` : `Hi${USER_NAME?' '+USER_NAME:''}! How can I help with your business loan today?`;
+  if(has('thank','dhanyaw','शुक्र','धन्यवाद'))
+    return hi? 'खुशी हुई! कुछ और पूछना हो तो बताइए।' : 'Happy to help! Ask me anything else.';
+  return hi? 'अच्छा सवाल! मैं oneNDF, आपके क्रेडिट स्कोर, लेंडर मैच, और FOIR/LTV/CIBIL/GST जैसी चीज़ों में मदद कर सकती हूँ। (लाइव AI जवाब के लिए Groq API कनेक्ट करें — नीचे setup देखें।)'
+          : 'Good question! I can help with oneNDF, your credit score, lender matches, and terms like FOIR/LTV/CIBIL/GST. (For live AI answers, connect the Groq API — see setup notes.)';
+}
+
+/* =================================================================
+   WIRE-UP
+================================================================= */
+document.addEventListener('DOMContentLoaded',()=>{
+  applyLang('en'); setTheme('light'); setPill('pill_know');
+  // gate
+  const enter=()=>enterSite(document.getElementById('nameInput').value);
+  document.getElementById('gateEnter').onclick=enter;
+  document.getElementById('gateSkip').onclick=()=>enterSite('');
+  document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')enter();});
+  setTimeout(()=>document.getElementById('nameInput').focus(),400);
+  // language
+  document.querySelectorAll('#langSeg button, #gateLangSeg button').forEach(b=>{
+    b.onclick=()=>applyLang(b.getAttribute('data-lang'));
+  });
+  // theme
+  document.getElementById('themeBtn').onclick=toggleTheme;
+  document.getElementById('gateTheme').onclick=toggleTheme;
+  // assistant
+  document.getElementById('asstFab').onclick=()=>{ document.getElementById('asstPanel').classList.add('open'); document.getElementById('asstFab').style.display='none'; if(!document.getElementById('asstBody').children.length) resetAssistant(); };
+  document.getElementById('asstClose').onclick=()=>{ document.getElementById('asstPanel').classList.remove('open'); document.getElementById('asstFab').style.display=''; };
+  document.getElementById('asstSend').onclick=sendAsst;
+  document.getElementById('asstInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendAsst();});
+  resetAssistant();
+});
+</script>
+</body>
+</html>
